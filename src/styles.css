@@ -171,7 +171,8 @@ button {
 }
 
 .badge-icon {
-  font-size: 1.4rem;
+  display: flex;
+  align-items: center;
 }
 
 .badge-text {
@@ -291,13 +292,16 @@ small {
 }
 
 .feature-icon {
-  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  color: var(--color-primary);
   flex-shrink: 0;
 }
 
 .feature-text {
   display: flex;
   flex-direction: column;
+  text-align: right;
   gap: 4px;
 }
 
@@ -317,6 +321,7 @@ small {
 
 .pack {
   position: relative;
+  cursor: pointer;
   padding: 28px;
   border-radius: var(--radius-md);
   transition:
@@ -329,6 +334,13 @@ small {
   transform: translateY(-5px);
   border-color: rgba(37, 99, 235, 0.28);
   box-shadow: var(--shadow-md);
+}
+
+.pack-selected {
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25), var(--shadow-md);
+  background: linear-gradient(180deg, rgba(239, 246, 255, 0.7), #ffffff 40%);
+  transform: translateY(-3px);
 }
 
 .pack-header {
@@ -414,7 +426,9 @@ small {
 }
 
 .guarantee-icon {
-  font-size: 1.8rem;
+  display: flex;
+  align-items: center;
+  color: var(--color-success);
   flex-shrink: 0;
 }
 
@@ -990,7 +1004,8 @@ select {
   }
 
   .feature-icon {
-    font-size: 1.3rem;
+    display: flex;
+    align-items: center;
   }
 
   .feature-text strong {
@@ -1036,7 +1051,8 @@ select {
   }
 
   .guarantee-icon {
-    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
   }
 
   .guarantee-text strong {

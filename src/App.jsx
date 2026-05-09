@@ -1,7 +1,9 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { Globe, Sparkles, FileText, Target, Rocket, ShieldCheck } from "lucide-react";
 import "./styles.css";
 
 export default function App() {
+  const [selectedPack, setSelectedPack] = useState(null);
   useEffect(() => {
     const scriptSources = [
       "https://www.gstatic.com/firebasejs/12.7.0/firebase-app-compat.js",
@@ -48,7 +50,7 @@ export default function App() {
       <section className="hero">
         <div className="hero-card">
           <div className="hero-badge">
-            <span className="badge-icon">🇩🇪</span>
+            <Globe className="badge-icon" size={22} />
             <span className="badge-text">عرض خاص لحاملي B1 / B2</span>
           </div>
 
@@ -67,38 +69,51 @@ export default function App() {
 
             <div className="features">
               <div className="feature-item">
-                <div className="feature-icon">✨</div>
+                <Sparkles className="feature-icon" size={24} />
                 <div className="feature-text">
                   <strong>تصحيح مجاني</strong>
                   <span>ديال السيرة الذاتية والملف كامل</span>
                 </div>
               </div>
               <div className="feature-item">
-                <div className="feature-icon">📝</div>
+                <FileText className="feature-icon" size={24} />
                 <div className="feature-text">
                   <strong>نموذج Anschreiben</strong>
                   <span>مناسب للبروفايل ديالك</span>
                 </div>
               </div>
               <div className="feature-item">
-                <div className="feature-icon">🎯</div>
+                <Target className="feature-icon" size={24} />
                 <div className="feature-text">
                   <strong>اختيار الشركات</strong>
                   <span>المناسبة بشكل مركز</span>
                 </div>
               </div>
               <div className="feature-item">
-                <div className="feature-icon">🚀</div>
+                <Rocket className="feature-icon" size={24} />
                 <div className="feature-text">
                   <strong>إرسال منظم ومكثف</strong>
                   <span>ديال الطلبات باسمك</span>
+                </div>
+              </div>
+              <div className="feature-item">
+                <ShieldCheck className="feature-icon" size={24} />
+                <div className="feature-text">
+                  <strong>ضمان الرضا</strong>
+                  <span>إلا ما كان حتى تفاعل أولي، كنزيدو دفعة إضافية مركزة فابور.</span>
                 </div>
               </div>
             </div>
           </div>
 
           <div className="packs">
-            <div className="pack">
+            <div
+              className={`pack ${selectedPack === "500 Bewerbung" ? "pack-selected" : ""}`}
+              onClick={() => setSelectedPack("500 Bewerbung")}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => { if (e.key === "Enter") setSelectedPack("500 Bewerbung"); }}
+            >
               <div className="pack-header">
                 <h3>500 bewerbung</h3>
                 <span className="pack-tag">اقتصادي</span>
@@ -111,10 +126,17 @@ export default function App() {
                 <li>500 طلب</li>
                 <li>تصحيح السيرة الذاتية</li>
                 <li>نموذج Anschreiben</li>
+                <li>مكطيحوش ف spam</li>
               </ul>
             </div>
 
-            <div className="pack popular">
+            <div
+              className={`pack popular ${selectedPack === "1000 Bewerbung" ? "pack-selected" : ""}`}
+              onClick={() => setSelectedPack("1000 Bewerbung")}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => { if (e.key === "Enter") setSelectedPack("1000 Bewerbung"); }}
+            >
               <div className="popular-badge">
                 <span>الأكثر طلباً</span>
               </div>
@@ -131,21 +153,14 @@ export default function App() {
                 <li>تصحيح السيرة الذاتية</li>
                 <li>نموذج Anschreiben</li>
                 <li>دعم مخصص</li>
+                <li>مكطيحوش ف spam</li>
               </ul>
-            </div>
-          </div>
-
-          <div className="guarantee">
-            <div className="guarantee-icon">🛡️</div>
-            <div className="guarantee-text">
-              <strong>ضمان الرضا</strong>
-              <span>إلا ما كان حتى تفاعل أولي، كنزيدو دفعة إضافية مركزة فابور.</span>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="form-section" id="contact">
+      <section className="form-section" id="contact" style={{ display: selectedPack ? "block" : "none" }}>
         <main className="page-shell">
           <section className="form-panel">
             <div className="panel-copy">
@@ -250,19 +265,12 @@ export default function App() {
                 <small>البداية ثابتة ولا يمكن تغييرها.</small>
               </label>
 
-              <label className="field">
-                <span>عدد الطلبات</span>
-                <select
-                  id="bewerbungen"
-                  name="bewerbungen"
-                  required
-                  defaultValue=""
-                >
-                  <option value="">اختر العدد</option>
-                  <option value="500 Bewerbung">500 Bewerbung</option>
-                  <option value="1000 Bewerbung">1000 Bewerbung</option>
-                </select>
-              </label>
+              <input
+                type="hidden"
+                id="bewerbungen"
+                name="bewerbungen"
+                value={selectedPack || ""}
+              />
 
               <div className="field field-upload">
                 <span>رفع الوثائق</span>
@@ -271,6 +279,7 @@ export default function App() {
                   className="file-input"
                   type="file"
                   id="documents"
+                  required
                   name="documents"
                   multiple
                   accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"

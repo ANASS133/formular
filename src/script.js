@@ -316,7 +316,6 @@ function validateRequiredFields() {
   const whatsapp = document.getElementById("whatsapp");
   const bank = document.getElementById("bank");
   const bereichSuffix = document.getElementById("bereichSuffix");
-  const bewerbungen = document.getElementById("bewerbungen");
 
   [
     fullName,
@@ -324,50 +323,50 @@ function validateRequiredFields() {
     whatsapp,
     bank,
     bereichSuffix,
-    bewerbungen,
     ...languageInputs,
   ].forEach(clearFieldError);
 
   if (!fullName.value.trim()) {
-    setFieldError(fullName, "Please enter the full name.");
+    setFieldError(fullName, "المرجو إدخال الاسم الكامل.");
     fullName.reportValidity();
     return false;
   }
 
   if (!email.value.trim()) {
-    setFieldError(email, "Please enter the email address.");
+    setFieldError(email, "المرجو إدخال البريد الإلكتروني.");
     email.reportValidity();
     return false;
   }
 
   if (!whatsapp.value.trim()) {
-    setFieldError(whatsapp, "Please enter the WhatsApp number.");
+    setFieldError(whatsapp, "المرجو إدخال رقم واتساب.");
     whatsapp.reportValidity();
     return false;
   }
 
   if (!bank.value.trim()) {
-    setFieldError(bank, "Please select a bank.");
+    setFieldError(bank, "المرجو اختيار البنك.");
     bank.reportValidity();
     return false;
   }
 
   if (!getSelectedLanguageLevel()) {
-    setFieldError(languageInputs[0], "Please select B1 or B2.");
+    setFieldError(languageInputs[0], "المرجو اختيار مستوى اللغة B1 أو B2.");
     languageInputs[0].reportValidity();
     languageInputs[0].focus();
     return false;
   }
 
   if (!bereichSuffix.value.trim()) {
-    setFieldError(bereichSuffix, "Please enter the field after 'ausbildung als'.");
+    setFieldError(bereichSuffix, "المرجو إدخال المجال بعد 'ausbildung als'.");
     bereichSuffix.reportValidity();
     return false;
   }
 
-  if (!bewerbungen.value.trim()) {
-    setFieldError(bewerbungen, "Please select the package.");
-    bewerbungen.reportValidity();
+  if (!selectedFiles.length) {
+    setFieldError(fileInput, "المرجو رفع الوثائق المطلوبة.");
+    fileInput.reportValidity();
+    uploadBox.focus();
     return false;
   }
 
@@ -467,7 +466,7 @@ async function handleSubmission() {
   }
 
   if (!validateRequiredFields() || !form.checkValidity()) {
-    showStatus("Please complete all required fields before submitting.", "error");
+    showStatus("المرجو إكمال جميع الحقول المطلوبة قبل الإرسال.", "error");
     form.reportValidity();
     return;
   }
@@ -510,7 +509,7 @@ async function handleSubmission() {
     const docRef = await db.collection("applications").add({
       ...payload,
       documents: uploadedDocuments,
-      createdAt: window.firebase.firestore.FieldValue.serverTimestamp(),
+      createdAt: new Date(),
       uploadStatus: uploadError ? "files-failed" : "completed",
       uploadError,
     });
