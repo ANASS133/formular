@@ -380,7 +380,7 @@ export default function App() {
                   <span className="rating-label">
                     
                     <ShieldCheck size={14} className="rating-cert-icon" />
-                    +300 مستفيد وثقو فينا
+                    +1000 مستفيد وثقو فينا
                   </span>
                 </div>
               </div>
