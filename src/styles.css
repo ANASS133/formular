@@ -2006,6 +2006,10 @@ input, select, button { font: inherit; }
   .pack.popular:hover { transform: translateY(-2px); }
   .pack.popular.pack-selected { transform: translateY(-3px); }
   .popular-ribbon { font-size: 0.65rem; padding: 5px 14px 5px 16px; left: -8px; }
+
+@media (max-width: 859px) {
+  .popular-ribbon { top: 85px; }
+}
   .form-section { padding: 36px 14px; }
   .page-shell { width: 100%; }
   .form-panel { border-radius: 22px; }
