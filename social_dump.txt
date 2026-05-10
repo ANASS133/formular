@@ -1,0 +1,10 @@
+social-proof-bar">
+          <div className="social-proof-stars">
+            <span className="social-proof-rating">4.8 / 5</span>
+            <span className="social-proof-stars-row">
+              {[...Array(5)].map((_, j) => (
+                <Star key={j} size={15} fill="#fbbf24" stroke="#f59e0b" strokeWidth={1} />
+              ))}
+            </span>
+          </div>
+          <span className="social-proof-count">+300 تقييم من طلبة فرحانين<

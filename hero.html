@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>نحو ألمانيا — Hero Section</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    /* ── Reset ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ── Base ── */
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Cairo', sans-serif;
+      color: #f1f5f9;
+      background-color: #0b0e14;
+      background-image:
+        /* subtle grid */
+        linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px),
+        /* radial glow */
+        radial-gradient(ellipse 70% 60% at 50% 0%, rgba(59,130,246,0.08), transparent),
+        radial-gradient(ellipse 50% 40% at 80% 60%, rgba(168,85,247,0.04), transparent);
+      background-size:
+        60px 60px,
+        60px 60px,
+        100% 100%,
+        100% 100%;
+      background-position: center;
+    }
+
+    /* ── Container ── */
+    .hero-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 28px;
+      max-width: 1200px;
+      width: 100%;
+      margin-inline: auto;
+      padding: 60px 24px;
+      text-align: center;
+    }
+
+    /* ── Badge ── */
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 20px;
+      border: 1px solid #3b82f6;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #93c5fd;
+      background: rgba(59,130,246,0.06);
+      box-shadow: 0 0 14px rgba(59,130,246,0.12), inset 0 0 10px rgba(59,130,246,0.06);
+    }
+
+    .hero-badge .badge-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #3b82f6;
+      box-shadow: 0 0 8px #3b82f6;
+    }
+
+    /* ── Hero Title ── */
+    .hero-title {
+      font-size: 2.4rem;
+      font-weight: 800;
+      line-height: 1.5;
+      max-width: 800px;
+    }
+
+    .hero-title .gradient-text {
+      background: linear-gradient(135deg, #06b6d4, #a855f7);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-title .price-highlight {
+      display: block;
+      font-size: 5rem;
+      font-weight: 900;
+      line-height: 1.2;
+      margin-top: 4px;
+      background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 60%, #cbd5e1 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* ── Buttons Row ── */
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 14px;
+      margin-top: 8px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 14px 32px;
+      border-radius: 12px;
+      font-family: 'Cairo', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      min-height: 50px;
+      user-select: none;
+    }
+
+    /* Primary — Purple */
+    .btn-primary {
+      background: #a855f7;
+      color: #fff;
+      box-shadow: 0 0 20px rgba(168,85,247,0.6);
+    }
+
+    .btn-primary:hover {
+      background: #9333ea;
+      box-shadow: 0 0 36px rgba(168,85,247,0.75);
+      transform: translateY(-2px);
+    }
+
+    /* Secondary — Green */
+    .btn-secondary {
+      background: #10b981;
+      color: #fff;
+      box-shadow: 0 0 20px rgba(16,185,129,0.6);
+    }
+
+    .btn-secondary:hover {
+      background: #059669;
+      box-shadow: 0 0 36px rgba(16,185,129,0.75);
+      transform: translateY(-2px);
+    }
+
+    /* Tertiary — Outline */
+    .btn-outline {
+      background: transparent;
+      color: #e2e8f0;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .btn-outline:hover {
+      background: rgba(255,255,255,0.06);
+      border-color: rgba(255,255,255,0.35);
+      box-shadow: 0 0 16px rgba(255,255,255,0.06);
+      transform: translateY(-2px);
+    }
+
+    /* ── WhatsApp Bar ── */
+    .whatsapp-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      width: 100%;
+      max-width: 620px;
+      padding: 16px 24px;
+      border-radius: 16px;
+      background: rgba(16,185,129,0.06);
+      border: 1px solid rgba(16,185,129,0.25);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      transition: all 0.3s ease;
+      margin-top: 12px;
+    }
+
+    .whatsapp-bar:hover {
+      border-color: rgba(16,185,129,0.4);
+      background: rgba(16,185,129,0.1);
+    }
+
+    .whatsapp-bar .wa-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+      font-size: 0.98rem;
+      color: #d1fae5;
+    }
+
+    .whatsapp-bar .wa-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: #25D366;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 0 14px rgba(37,211,102,0.5);
+    }
+
+    .whatsapp-bar .wa-icon svg {
+      width: 22px;
+      height: 22px;
+      fill: #fff;
+    }
+
+    .whatsapp-bar .wa-right {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: #6ee7b7;
+      flex-shrink: 0;
+    }
+
+    .whatsapp-bar .wa-arrow {
+      transition: transform 0.3s ease;
+    }
+
+    .whatsapp-bar:hover .wa-arrow {
+      transform: translateX(-4px);
+    }
+
+    /* ── Footer Stats ── */
+    .footer-stats {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 620px;
+      margin-top: 16px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .avatar-stack {
+      display: flex;
+      align-items: center;
+    }
+
+    .avatar-stack .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 2px solid #0b0e14;
+      object-fit: cover;
+      margin-left: -12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+    }
+
+    .avatar-stack .avatar:first-child {
+      margin-left: 0;
+    }
+
+    .avatar-stack .avatar-count {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #1e293b;
+      border: 2px solid #0b0e14;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: #94a3b8;
+      margin-left: -12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+    }
+
+    .rating {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+    }
+
+    .stars {
+      display: flex;
+      gap: 2px;
+      color: #fbbf24;
+      font-size: 1.2rem;
+      line-height: 1;
+    }
+
+    .rating-label {
+      font-size: 0.85rem;
+      color: #94a3b8;
+      font-weight: 600;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 699px) {
+      .hero-title { font-size: 1.7rem; }
+      .hero-title .price-highlight { font-size: 3.2rem; }
+      .btn { padding: 12px 24px; font-size: 0.92rem; }
+      .button-row { flex-direction: column; align-items: stretch; }
+      .whatsapp-bar { flex-direction: column; text-align: center; gap: 12px; }
+      .footer-stats { flex-direction: column; gap: 16px; align-items: center; }
+      .rating { align-items: center; }
+      .avatar-stack .avatar { width: 34px; height: 34px; }
+      .avatar-stack .avatar-count { width: 34px; height: 34px; font-size: 0.7rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="hero-container">
+
+    <!-- Badge -->
+    <div class="hero-badge">
+      <span class="badge-dot"></span>
+      عرض خاص — فرصتك نحو ألمانيا
+    </div>
+
+    <!-- Hero Title -->
+    <h1 class="hero-title">
+      اش بان لك تمشي
+      <span class="gradient-text">لالمانيا</span>
+      بـ
+      <span class="price-highlight">400 درهم</span>
+    </h1>
+
+    <!-- Buttons -->
+    <div class="button-row">
+      <a href="#" class="btn btn-primary">
+        🚀 ابدأ الآن
+      </a>
+      <a href="#" class="btn btn-secondary">
+        ✅ شوف الباقات
+      </a>
+      <a href="#" class="btn btn-outline">
+        💬 تواصل معنا
+      </a>
+    </div>
+
+    <!-- WhatsApp Bar -->
+    <a href="#" class="whatsapp-bar">
+      <div class="wa-left">
+        <div class="wa-icon">
+          <svg viewBox="0 0 24 24">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/>
+          </svg>
+        </div>
+        <span>أسئلة ولا استفسار؟ تواصل معنا عبر الواتساب</span>
+      </div>
+      <div class="wa-right">
+        <span>راسلنا</span>
+        <span class="wa-arrow">←</span>
+      </div>
+    </a>
+
+    <!-- Footer Stats -->
+    <div class="footer-stats">
+      <div class="avatar-stack">
+        <div class="avatar" style="background:#f59e0b;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.9rem;color:#0b0e14;">م</div>
+        <div class="avatar" style="background:#3b82f6;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.9rem;color:#fff;">ف</div>
+        <div class="avatar" style="background:#10b981;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.9rem;color:#fff;">ي</div>
+        <div class="avatar" style="background:#a855f7;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.9rem;color:#fff;">أ</div>
+        <div class="avatar-count">+35</div>
+      </div>
+      <div class="rating">
+        <div class="stars">★ ★ ★ ★ ★</div>
+        <span class="rating-label">+300 تقييم من طلبة فرحانين</span>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>

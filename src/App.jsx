@@ -2,9 +2,11 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import {
   Globe, Sparkles, FileText, Target, Rocket, ShieldCheck,
   Sun, Moon, Check, ChevronDown, Star, MessageCircle,
-  MessageSquare, HelpCircle
+  MessageSquare, HelpCircle, Plane, ClipboardList,
+  PenLine, Handshake, Package, GraduationCap
 } from "lucide-react";
 import "./styles.css";
+import CustomSelect from "./CustomSelect";
 
 /* ── FAQ data ── */
 const FAQ_ITEMS = [
@@ -36,16 +38,49 @@ const TESTIMONIALS = [
     text: "خدمة رائعة! تصحيح الـ CV كان احترافي ووصلاتني بزاف ديال الردود من شركات ف ميونيخ وبرلين. أنصح بها بشدة.",
     author: "محمد",
     city: "الدار البيضاء",
+    level: "B2",
+    avatar: "م",
+    avatarBg: "#f59e0b",
   },
   {
     text: "المعاملة كانت مزيانة والتنظيم دياولهم عجبني. الفريق تابع معايا خطوة بخطوة حتى تأكد بلي كاين تفاعل.",
     author: "فاطمة",
     city: "مراكش",
+    level: "B1",
+    avatar: "ف",
+    avatarBg: "#3b82f6",
   },
   {
     text: "خدمتهم نقية وصافي. أنا شخصياً وصلت لمقابلة ف أسبوعين من مور ما بداو الإرسال. شكراً ليكم.",
     author: "يوسف",
     city: "طنجة",
+    level: "B2",
+    avatar: "ي",
+    avatarBg: "#10b981",
+  },
+  {
+    text: "التنظيم والتواصل كانو فالمستوى، والـ Anschreiben اللي كتبوه ليا كان مخصص ومضبوط. خدمة محترفة بكل المقاييس.",
+    author: "أمينة",
+    city: "الرباط",
+    level: "B2",
+    avatar: "أ",
+    avatarBg: "#a855f7",
+  },
+  {
+    text: "فخور بزاف بالنتائج. وصلو ليا عروض من شركات كبيرة ف شتوتغارت وفرانكفورت. شكراً من القلب.",
+    author: "عمر",
+    city: "فاس",
+    level: "B1",
+    avatar: "ع",
+    avatarBg: "#ef4444",
+  },
+  {
+    text: "كنت متخوف فالأول ولكن من بعد ما شفت التفاعل والردود اللي وصلو، تأكدت بلي الخدمة مضمونة وفعالة.",
+    author: "نور",
+    city: "أكادير",
+    level: "B2",
+    avatar: "ن",
+    avatarBg: "#06b6d4",
   },
 ];
 
@@ -116,6 +151,26 @@ export default function App() {
     const els = document.querySelectorAll(".feature-item");
     els.forEach((el) => observer.observe(el));
     return () => observer.disconnect();
+  }, [loaded]);
+
+  /* ── Scroll reveal animation ── */
+  useEffect(() => {
+    if (!loaded) return;
+    const revealObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("visible");
+            revealObserver.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.15, rootMargin: "0px 0px -30px 0px" }
+    );
+
+    const revealEls = document.querySelectorAll(".reveal");
+    revealEls.forEach((el) => revealObserver.observe(el));
+    return () => revealObserver.disconnect();
   }, [loaded]);
 
   /* ── Download results handler ── */
@@ -259,48 +314,74 @@ export default function App() {
               </div>
             </div>
           ) : (
-            <>
-              <div className="hero-badge">
-                <Globe className="badge-icon" size={22} />
-                <span className="badge-text">عرض خاص لحاملي B1 / B2</span>
+            <div className="hero-shell">
+              {/* Text column */}
+              <div className="hero-text-col">
+              <div className="hero-badge reveal reveal-up reveal-d1">
+                <span className="badge-dot"></span>
+                عرض خاص — فرصتك نحو ألمانيا
               </div>
 
-              <div className="hero-content">
-                <h1 className="hero-title">
-                  <span className="highlight">اش بان لك</span>
-                  <br />
-                  تمشي المانيا ب 400 درهم
-                </h1>
+              <h1 className="hero-title reveal reveal-up reveal-d2"> اش بان لك تمشي{" "}
+                <span className="gradient-text">لالمانيا</span>
+                {" "}بـ 
+                <span className="price-highlight">400 درهم</span>
+              </h1>
 
-                <p className="subtitle">
-                  خدمة موجهة للناس اللي عندهم{" "}
-                   <strong>B1 أو B2 فالألمانية</strong>
-                  وكيقلبو على تكوين مهني وفرص مناسبة فألمانيا.
-                </p>
+              <div className="offer-snippet reveal reveal-up reveal-d3">
+                <span><ClipboardList size={16} /> تصحيح CV كامل</span>
+                <span><PenLine size={16} /> Anschreiben مخصص</span>
+                <span><Target size={16} /> إرسال للشركات</span>
+                <span><Handshake size={16} /> متابعة شخصية</span>
+              </div>
 
-                {/* Stat bar */}
-                <div className="stats-bar">
-                  <div className="stat-item">
-                    <Check size={16} />
-                    <span>
-                      <strong>+500</strong> مرشح تمت مساعدتهم
-                    </span>
+              <div className="button-row reveal reveal-up reveal-d4">
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={() => formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })}
+                >
+                  <Rocket size={18} /> ابدأ الآن
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-outline"
+                  onClick={() => document.querySelector(".packs")?.scrollIntoView({ behavior: "smooth", block: "start" })}
+                >
+                  <Package size={18} /> شوف الباقات
+                </button>
+                <a
+                  href="https://wa.me/212699771759"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-secondary"
+                >
+                  <MessageCircle size={18} /> تواصل معنا
+                </a>
+              </div>
+
+            
+              <div className="footer-stats reveal reveal-up reveal-d6">
+                <div className="avatar-stack">
+                  <div className="avatar" style={{ background: "linear-gradient(135deg, #f59e0b, #f97316)", color: "#fff" }}>م</div>
+                  <div className="avatar" style={{ background: "linear-gradient(135deg, #3b82f6, #6366f1)", color: "#fff" }}>ف</div>
+                  <div className="avatar" style={{ background: "linear-gradient(135deg, #10b981, #06b6d4)", color: "#fff" }}>ي</div>
+                  <div className="avatar" style={{ background: "linear-gradient(135deg, #a855f7, #ec4899)", color: "#fff" }}>أ</div>
+                  <div className="avatar-count">+35</div>
+              </div> 
+                <div className="rating">
+                  <div className="stars">
+                    {[...Array(5)].map((_, j) => (
+                      <Star key={j} size={18} fill="#fbbf24" stroke="#f59e0b" strokeWidth={1} />
+                    ))}
                   </div>
-                  <div className="stat-item">
-                    <Star size={16} />
-                    <span>
-                      <strong>%98</strong> نسبة الرضا
-                    </span>
-                  </div>
-                  <div className="stat-item">
-                    <Rocket size={16} />
-                    <span>
-                      <strong>+100,000</strong> طلب تم إرسالهم
-                    </span>
-                  </div>
+                  <span className="rating-label">
+                    
+                    <ShieldCheck size={14} className="rating-cert-icon" />
+                    +300 مستفيد وثقو فينا
+                  </span>
                 </div>
               </div>
-
               <div className="features">
                 {[
                   {
@@ -325,7 +406,7 @@ export default function App() {
                   },
                   {
                     Icon: ShieldCheck,
-                    title: "ضمان الرضا",
+                    title: "ضمان ",
                     desc: "إلا ما كان حتى تفاعل أولي، كنزيدو دفعة إضافية مركزة فابور.",
                   },
                 ].map(({ Icon, title, desc }, i) => (
@@ -345,13 +426,14 @@ export default function App() {
                   </div>
                 ))}
               </div>
-            </>
+              </div> 
+            </div>
           )}
 
           {/* Packs */}
           <div className="packs">
             <div
-              className={`pack${selectedPack === "500 Bewerbung" ? " pack-selected" : ""}`}
+              className={`pack silver reveal reveal-left${selectedPack === "500 Bewerbung" ? " pack-selected" : ""}`}
               onClick={() => setSelectedPack("500 Bewerbung")}
               role="button"
               tabIndex={0}
@@ -364,11 +446,11 @@ export default function App() {
               )}
               <div className="pack-header">
                 <h3>500 bewerbung</h3>
-                <span className="pack-tag">اقتصادي</span>
+                <span className="pack-tag">Silver</span>
               </div>
               <div className="pack-price">
+                                <strong>250</strong>
                 <span className="currency">درهم</span>
-                <strong>200</strong>
               </div>
               <ul className="pack-features">
                 <li>500 طلب</li>
@@ -382,12 +464,11 @@ export default function App() {
                 className="cta-btn"
                 onClick={(e) => { e.stopPropagation(); setSelectedPack("500 Bewerbung"); }}
               >
-                اختر الباقة
-              </button>
+تسجيل              </button>
             </div>
 
             <div
-              className={`pack popular${selectedPack === "1000 Bewerbung" ? " pack-selected" : ""}`}
+              className={`pack gold popular reveal reveal-right${selectedPack === "1000 Bewerbung" ? " pack-selected" : ""}`}
               onClick={() => setSelectedPack("1000 Bewerbung")}
               role="button"
               tabIndex={0}
@@ -406,12 +487,12 @@ export default function App() {
               )}
               <div className="pack-header">
                 <h3>1000 bewerbung</h3>
-                <span className="pack-tag">مميز</span>
+                <span className="pack-tag">Gold</span>
               </div>
               <div className="pack-price">
-                <span className="currency">درهم</span>
-                <strong>400</strong>
-                <span className="strike">200</span>
+                                <strong>400</strong>
+<span className="currency">درهم</span>
+                <span className="strike">500</span>
               </div>
               <ul className="pack-features">
                 <li>1000 طلب</li>
@@ -426,13 +507,12 @@ export default function App() {
                 className="cta-btn accent"
                 onClick={(e) => { e.stopPropagation(); setSelectedPack("1000 Bewerbung"); }}
               >
-                اختر الباقة المميزة
-              </button>
+تسجيل              </button>
             </div>
           </div>
 
           {/* Trust badges */}
-          <div className="trust-badges">
+          <div className="trust-badges reveal reveal-up">
             <div className="trust-badge-item">
               <ShieldCheck size={14} />
               <span>بيانات آمنة</span>
@@ -458,7 +538,6 @@ export default function App() {
         <main className="page-shell">
           <section className="form-panel">
             <div className="panel-copy">
-              <p className="eyebrow">الحجز</p>
               <h2>عمّر الاستمارة وخلي فريقنا يتكلف بالباقي</h2>
               <p className="intro">
                 دخل معلوماتك، اختار الباقة المناسبة، ورفع الوثائق ديالك باش نبداو
@@ -522,14 +601,19 @@ export default function App() {
                   </div>
                 </label>
 
-                <label className="field">
+                <label className="field" id="bank-label">
                   <span>البنك</span>
-                  <select id="bank" name="bank" required defaultValue="">
-                    <option value="">اختر البنك</option>
-                    <option value="البنك الشعبي">البنك الشعبي</option>
-                    <option value="CIH">CIH</option>
-                    <option value="كاش بلوس">كاش بلوس</option>
-                  </select>
+                  <CustomSelect
+                    name="bank"
+                    placeholder="اختر البنك"
+                    required
+                    defaultValue=""
+                    options={[
+                      { value: "البنك الشعبي", label: "البنك الشعبي" },
+                      { value: "CIH", label: "CIH" },
+                      { value: "كاش بلوس", label: "كاش بلوس" },
+                    ]}
+                  />
                 </label>
 
                 <div className="wizard-nav">
@@ -691,17 +775,57 @@ export default function App() {
         </h2>
         <div className="testimonials-grid">
           {TESTIMONIALS.map((t, i) => (
-            <div key={i} className="testimonial-card">
-              <div className="testimonial-stars">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} size={16} fill="var(--color-warning)" strokeWidth={1} />
-                ))}
+            <div key={i} className={`testimonial-card reveal reveal-up reveal-d${(i % 6) + 1}`}>
+              {/* Header: stars left, badge right */}
+              <div className="testimonial-header">
+                <div className="testimonial-stars">
+                  {[...Array(5)].map((_, j) => (
+                    <svg key={j} width="16" height="16" viewBox="0 0 20 20" className="star-icon">
+                      <defs>
+                        <linearGradient id={`ts-gold-${i}-${j}`} x1="0%" y1="0%" x2="100%" y2="100%">
+                          <stop offset="0%" stopColor="#fbbf24" />
+                          <stop offset="100%" stopColor="#f59e0b" />
+                        </linearGradient>
+                      </defs>
+                      <path
+                        d="M9.538 1.61a.5.5 0 0 1 .924 0l2.066 4.967a.5.5 0 0 0 .421.307l5.363.43a.5.5 0 0 1 .286.878l-4.086 3.5a.5.5 0 0 0-.161.496l1.248 5.233a.5.5 0 0 1-.747.543L10 15.01l-4.852 2.955a.5.5 0 0 1-.747-.543l1.248-5.233a.5.5 0 0 0-.161-.496l-4.086-3.5a.5.5 0 0 1 .286-.878l5.363-.43a.5.5 0 0 0 .421-.307L9.538 1.61Z"
+                        fill={`url(#ts-gold-${i}-${j})`}
+                      />
+                    </svg>
+                  ))}
+                </div>
+                <span className="testimonial-badge">✓ {t.level}</span>
               </div>
+
+              {/* Body */}
               <p className="testimonial-text">"{t.text}"</p>
-              <p className="testimonial-author">{t.author}</p>
-              <p className="testimonial-city">{t.city}</p>
+
+              {/* Footer: avatar + user info */}
+              <div className="testimonial-footer">
+                <div className="testimonial-avatar" style={{ background: t.avatarBg }}>{t.avatar}</div>
+                <div className="testimonial-user">
+                  <p className="testimonial-author">{t.author}</p>
+                  <p className="testimonial-city">{t.city}</p>
+                </div>
+              </div>
             </div>
           ))}
+        </div>
+
+        {/* Social Proof Bar */}
+        <div className="social-proof-bar reveal reveal-up">
+          <div className="social-proof-stars">
+            <span className="social-proof-rating">4.8 / 5</span>
+            <span className="social-proof-stars-row">
+              {[...Array(5)].map((_, j) => (
+                <Star key={j} size={15} fill="#fbbf24" stroke="#f59e0b" strokeWidth={1} />
+              ))}
+            </span>
+          </div>
+          <span className="social-proof-count">
+            <ShieldCheck size={14} className="social-cert-icon" />
+            +300 مستفيد وثقو فينا
+          </span>
         </div>
       </section>
 

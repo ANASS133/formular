@@ -1,0 +1,95 @@
+667: /* ── Pack Cards ── */
+668: .packs {
+669:   display: grid;
+670:   grid-template-columns: 1fr 1fr;
+671:   gap: 18px;
+672:   margin: 8px 0 20px;
+673: }
+674: 
+675: .pack {
+676:   position: relative;
+677:   padding: 32px 26px;
+678:   border-radius: var(--radius-xl);
+679:   background: var(--color-surface);
+680:   backdrop-filter: blur(16px);
+681:   -webkit-backdrop-filter: blur(16px);
+682:   border: 1px solid var(--color-border);
+683:   cursor: pointer;
+684:   transition: border-color 280ms var(--ease-out), box-shadow 280ms var(--ease-out), transform 280ms var(--ease-out);
+685:   user-select: none;
+686:   overflow: hidden;
+687: }
+688: 
+689: /* subtle inner glow on hover */
+690: .pack::after {
+691:   content: "";
+692:   position: absolute;
+693:   inset: 0;
+694:   border-radius: inherit;
+695:   opacity: 0;
+696:   transition: opacity 0.3s;
+697:   background: radial-gradient(ellipse at center, var(--color-primary-glow), transparent 70%);
+698:   pointer-events: none;
+699: }
+700: 
+701: .pack:hover::after {
+702:   opacity: 0.06;
+703: }
+704: 
+705: .pack:hover {
+706:   border-color: var(--color-border-strong);
+707:   box-shadow: var(--shadow-md);
+708: }
+709: 
+710: .pack-selected {
+711:   border-color: var(--color-primary-glow) !important;
+712:   box-shadow: var(--shadow-glow) !important;
+713:   transform: translateY(-3px);
+714: }
+715: 
+716: /* ── Gold Pack ── */
+717: .pack.gold {
+718:   border-color: rgba(245, 158, 11, 0.5);
+719:   box-shadow: 0 0 18px rgba(245, 158, 11, 0.1);
+720: }
+721: 
+722: .pack.gold:hover {
+723:   border-color: rgba(245, 158, 11, 0.65);
+724:   box-shadow: 0 0 28px rgba(245, 158, 11, 0.2);
+725: }
+726: 
+727: .pack.gold.pack-selected {
+728:   border-color: rgba(245, 158, 11, 0.7) !important;
+729:   box-shadow: 0 0 28px rgba(245, 158, 11, 0.25) !important;
+730: }
+731: 
+732: /* ── Silver Pack ── */
+733: .pack.silver {
+734:   border-color: rgba(156, 163, 175, 0.45);
+735:   box-shadow: 0 0 14px rgba(156, 163, 175, 0.08);
+736: }
+737: 
+738: .pack.silver:hover {
+739:   border-color: rgba(156, 163, 175, 0.6);
+740:   box-shadow: 0 0 22px rgba(156, 163, 175, 0.12);
+741: }
+742: 
+743: .pack.silver.pack-selected {
+744:   border-color: rgba(156, 163, 175, 0.65) !important;
+745:   box-shadow: 0 0 22px rgba(156, 163, 175, 0.15) !important;
+746: }
+747: 
+748: /* ── Popular (scale boost, kept for gold pack) ── */
+749: .pack.popular {
+750:   transform: scale(1.03);
+751: }
+752: 
+753: .pack.popular:hover {
+754:   transform: scale(1.04);
+755: }
+756: 
+757: .pack.popular.pack-selected {
+758:   transform: scale(1.04) translateY(-3px);
+759: }
+760: 
+761: /* ── Ribbon ── */

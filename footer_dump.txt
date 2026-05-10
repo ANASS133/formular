@@ -1,0 +1,12 @@
+      
+            
+              <div className="footer-stats">
+                <div className="avatar-stack">
+                  <div className="avatar" style={{ background: "#f59e0b", color: "#0b0e14" }}>م</div>
+                  <div className="avatar" style={{ background: "#3b82f6", color: "#fff" }}>ف</div>
+                  <div className="avatar" style={{ background: "#10b981", color: "#fff" }}>ي</div>
+                  <div className="avatar" style={{ background: "#a855f7", color: "#fff" }}>أ</div>
+                  <div className="avatar-count">+35</div>
+                </div>
+                <div className="rating">
+                 
