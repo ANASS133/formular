@@ -17,31 +17,223 @@ const form = document.getElementById("candidate-form");
 const fileInput = document.getElementById("documents");
 const fileList = document.getElementById("file-list");
 const uploadBox = document.getElementById("upload-box");
-const uploadCopy = uploadBox.querySelector(".upload-copy");
-const uploadTitle = uploadBox.querySelector("strong");
-const submitButton = form.querySelector(".submit-button");
+const uploadCopy = uploadBox ? uploadBox.querySelector(".upload-copy") : null;
+const uploadTitle = uploadBox ? uploadBox.querySelector("strong") : null;
+const submitButton = form ? form.querySelector(".submit-button") : null;
 const statusMessage = document.getElementById("status-message");
-const languageChoiceCards = Array.from(form.querySelectorAll(".choice-card"));
-const languageInputs = Array.from(form.querySelectorAll('input[name="languageLevel"]'));
+const languageChoiceCards = Array.from(form ? form.querySelectorAll(".choice-card") : []);
+const languageInputs = Array.from(form ? form.querySelectorAll('input[name="languageLevel"]') : []);
 const languageProof = document.getElementById("language-proof");
+const whatsappInput = document.getElementById("whatsapp");
+const totalSizeBar = document.getElementById("total-size-bar");
+const totalSizeText = document.getElementById("total-size-text");
+const totalSizePct = document.getElementById("total-size-pct");
+const totalSizeFill = document.getElementById("total-size-fill");
 
 let selectedFiles = [];
 let firebaseInitError = null;
 let db = null;
 let storageServices = [];
 
+/* ── File type helpers ── */
+function getFileExtension(name) {
+  const lastDot = name.lastIndexOf(".");
+  return lastDot > -1 ? name.slice(lastDot + 1).toLowerCase() : "";
+}
+
+function isImageFile(name) {
+  const ext = getFileExtension(name);
+  return ["jpg", "jpeg", "png", "gif", "webp", "bmp", "svg"].includes(ext);
+}
+
+function getFileCategoryIcon(name) {
+  const ext = getFileExtension(name);
+  if (["pdf"].includes(ext)) return "PDF";
+  if (["doc", "docx"].includes(ext)) return "DOC";
+  if (["jpg", "jpeg", "png", "gif", "webp"].includes(ext)) return "IMG";
+  return ext.toUpperCase().slice(0, 3);
+}
+
+function formatFileSize(bytes) {
+  if (bytes < 1024) return bytes + " B";
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
+  return (bytes / (1024 * 1024)).toFixed(1) + " MB";
+}
+
+/* ── Total size bar ── */
+function updateTotalSizeBar() {
+  if (!totalSizeBar) return;
+  const totalBytes = selectedFiles.reduce((sum, f) => sum + f.size, 0);
+  const totalMB = (totalBytes / (1024 * 1024)).toFixed(1);
+  const pct = Math.min(Math.round((totalBytes / MAX_TOTAL_SIZE_BYTES) * 100), 100);
+
+  if (totalSizeText) totalSizeText.textContent = totalMB + " MB / 25 MB";
+  if (totalSizePct) totalSizePct.textContent = pct + "%";
+  if (totalSizeFill) {
+    totalSizeFill.style.width = pct + "%";
+    totalSizeFill.classList.remove("warning", "danger");
+    if (pct > 90) totalSizeFill.classList.add("danger");
+    else if (pct > 70) totalSizeFill.classList.add("warning");
+  }
+
+  totalSizeBar.style.display = selectedFiles.length ? "block" : "none";
+}
+
+/* ── File list rendering ── */
+function renderFiles() {
+  if (!fileList) return;
+
+  fileList.innerHTML = "";
+  selectedFiles.forEach((file, index) => {
+    const item = document.createElement("div");
+    item.className = "file-item";
+
+    const icon = document.createElement("div");
+    const isImg = isImageFile(file.name);
+
+    if (isImg) {
+      const img = document.createElement("img");
+      img.className = "file-preview-img";
+      img.alt = file.name;
+      img.src = URL.createObjectURL(file);
+      icon.appendChild(img);
+    } else {
+      icon.className = "file-icon";
+      icon.textContent = getFileCategoryIcon(file.name);
+    }
+
+    const info = document.createElement("div");
+    info.className = "file-info";
+
+    const name = document.createElement("span");
+    name.className = "file-name";
+    name.textContent = file.name;
+
+    const size = document.createElement("span");
+    size.className = "file-size";
+    size.textContent = formatFileSize(file.size);
+
+    info.appendChild(name);
+    info.appendChild(size);
+
+    const remove = document.createElement("button");
+    remove.className = "file-remove";
+    remove.type = "button";
+    remove.innerHTML = "✕";
+    remove.title = "Remove file";
+    remove.addEventListener("click", () => {
+      selectedFiles.splice(index, 1);
+      updateFileInput();
+      renderFiles();
+      updateTotalSizeBar();
+    });
+
+    item.appendChild(icon);
+    item.appendChild(info);
+    item.appendChild(remove);
+    fileList.appendChild(item);
+  });
+
+  updateTotalSizeBar();
+}
+
+function updateFileInput() {
+  const dt = new DataTransfer();
+  selectedFiles.forEach((f) => dt.items.add(f));
+  fileInput.files = dt.files;
+  updateUploadLabel();
+}
+
+function updateUploadLabel() {
+  if (!uploadCopy || !uploadTitle) return;
+  if (selectedFiles.length === 0) {
+    uploadTitle.textContent = "اختر الملفات";
+    uploadCopy.textContent = "اضغط لاختيار الملفات أو اسحبها إلى هذه المساحة.";
+  } else {
+    uploadTitle.textContent = selectedFiles.length + " ملف(ات) مختارة";
+    uploadCopy.textContent = "اضغط لإضافة المزيد أو اسحب ملفات جديدة.";
+  }
+}
+
+/* ── WhatsApp auto-formatting ── */
+function formatWhatsApp(raw) {
+  let digits = raw.replace(/\D/g, "");
+  if (digits.startsWith("212")) {
+    digits = digits.slice(2);
+  } else if (digits.startsWith("00212")) {
+    digits = digits.slice(4);
+  } else if (digits.startsWith("0")) {
+    digits = digits.slice(1);
+  }
+
+  if (digits.length > 9) digits = digits.slice(0, 9);
+
+  let formatted = "";
+  if (digits.length <= 3) {
+    formatted = digits;
+  } else if (digits.length <= 6) {
+    formatted = digits.slice(0, 3) + " " + digits.slice(3);
+  } else {
+    formatted = digits.slice(0, 3) + " " + digits.slice(3, 6) + " " + digits.slice(6);
+  }
+
+  return formatted;
+}
+
+/* ── Inline validation ── */
+function showFieldError(element, message) {
+  if (!element) return;
+  element.classList.add("error");
+  element.setCustomValidity(message);
+}
+
+function clearFieldError(element) {
+  if (!element) return;
+  element.classList.remove("error");
+  element.setCustomValidity("");
+}
+
+function validateName(value) {
+  if (!value || !value.trim()) return "الاسم الكامل مطلوب";
+  if (value.trim().length < 3) return "الاسم قصير جداً";
+  return "";
+}
+
+function validateEmail(value) {
+  if (!value || !value.trim()) return "البريد الإلكتروني مطلوب";
+  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!re.test(value.trim())) return "البريد الإلكتروني غير صالح";
+  return "";
+}
+
+function validateWhatsApp(value) {
+  const digits = value.replace(/\D/g, "");
+  if (!digits) return "رقم الواتساب مطلوب";
+  if (digits.length < 8) return "رقم الواتساب غير مكتمل";
+  return "";
+}
+
+function validateField(element, validator) {
+  if (!element) return true;
+  const msg = validator(element.value);
+  if (msg) {
+    showFieldError(element, msg);
+    return false;
+  }
+  clearFieldError(element);
+  return true;
+}
+
+/* ── Firebase setup ── */
 function getStorageBucketCandidates(bucketName) {
   const normalized = String(bucketName || "").trim();
   const candidates = [];
-
   if (normalized) {
     candidates.push(normalized);
   }
-
   if (normalized.endsWith(".firebasestorage.app")) {
     candidates.push(normalized.replace(/\.firebasestorage\.app$/i, ".appspot.com"));
   }
-
   return Array.from(new Set(candidates.filter(Boolean)));
 }
 
@@ -49,14 +241,12 @@ try {
   if (!window.firebase) {
     throw new Error("Firebase SDK is not available on this page.");
   }
-
   if (!window.firebase.apps.length) {
     window.firebase.initializeApp(firebaseConfig);
   }
-
   db = window.firebase.firestore();
   storageServices = getStorageBucketCandidates(firebaseConfig.storageBucket).map((bucketName) =>
-    window.firebase.app().storage(`gs://${bucketName}`),
+    window.firebase.app().storage("gs://" + bucketName)
   );
   if (!storageServices.length) {
     storageServices = [window.firebase.storage()];
@@ -70,14 +260,7 @@ try {
   console.error("Firebase initialization failed", error);
 }
 
-function setFieldError(element, message) {
-  element.setCustomValidity(message);
-}
-
-function clearFieldError(element) {
-  element.setCustomValidity("");
-}
-
+/* ── Language level ── */
 function clearLanguageError() {
   languageInputs.forEach(clearFieldError);
 }
@@ -89,17 +272,13 @@ function getSelectedLanguageLevel() {
 
 function getBereichValue() {
   const suffix = document.getElementById("bereichSuffix").value.trim();
-  return suffix ? `${BEREICH_PREFIX} ${suffix}` : "";
+  return suffix ? BEREICH_PREFIX + " " + suffix : "";
 }
 
-function updateLanguageProof(value, animate = false) {
-  if (!languageProof) {
-    return;
-  }
-
-  languageProof.textContent = value ? `Selected: ${value}` : "";
+function updateLanguageProof(value, animate) {
+  if (!languageProof) return;
+  languageProof.textContent = value ? "Selected: " + value : "";
   languageProof.classList.toggle("is-visible", Boolean(value));
-
   if (animate && value) {
     languageProof.classList.remove("is-animating");
     void languageProof.offsetWidth;
@@ -112,204 +291,86 @@ function syncLanguageChoices() {
     const input = card.querySelector('input[name="languageLevel"]');
     const isSelected = Boolean(input && input.checked);
     card.classList.toggle("is-selected", isSelected);
-
-    if (!isSelected) {
-      card.classList.remove("is-animating");
-    }
+    if (!isSelected) card.classList.remove("is-animating");
   });
-
   updateLanguageProof(getSelectedLanguageLevel());
 }
 
 function selectLanguageChoice(input) {
-  if (!input) {
-    return;
-  }
-
+  if (!input) return;
   input.checked = true;
   clearLanguageError();
-  languageChoiceCards.forEach((card) => {
-    card.classList.remove("is-animating");
-  });
-  syncLanguageChoices();
-
+  languageChoiceCards.forEach((card) => card.classList.remove("is-animating"));
   const card = input.closest(".choice-card");
   if (card) {
-    void card.offsetWidth;
-    card.classList.add("is-animating");
+    card.classList.add("is-selected", "is-animating");
   }
-
-  updateLanguageProof(input.value, true);
+  updateLanguageProof(getSelectedLanguageLevel(), true);
 }
 
-function formatFileSize(size) {
-  if (typeof size !== "number" || Number.isNaN(size) || size < 0) {
-    return "Unknown size";
-  }
-
-  if (size < 1024) {
-    return `${size} B`;
-  }
-
-  if (size < 1024 * 1024) {
-    return `${(size / 1024).toFixed(1)} KB`;
-  }
-
-  return `${(size / (1024 * 1024)).toFixed(1)} MB`;
+/* ── Status ── */
+function showStatus(message, type) {
+  if (!statusMessage) return;
+  statusMessage.textContent = message;
+  statusMessage.className = "status-message";
+  if (type) statusMessage.classList.add(type);
 }
 
-function formatFilesSummary(files) {
-  const totalSize = files.reduce((sum, file) => sum + file.size, 0);
-  return `${files.length} file(s), ${formatFileSize(totalSize)} total`;
+/* ── Submitting ── */
+function setSubmitting(loading) {
+  if (!submitButton) return;
+  if (loading) {
+    submitButton.disabled = true;
+    submitButton.innerHTML = '<span class="submit-spinner"></span> جاري الإرسال...';
+  } else {
+    submitButton.disabled = false;
+    submitButton.textContent = "إرسال الاستمارة";
+  }
+}
+
+/* ── Firebase upload helpers ── */
+function humanizeFirebaseError(error) {
+  if (!error) return "Unknown error";
+  if (typeof error === "string") return error;
+  if (error.message) return error.message;
+  return JSON.stringify(error);
 }
 
 function createSubmissionId() {
-  if (window.crypto && typeof window.crypto.randomUUID === "function") {
-    return window.crypto.randomUUID();
-  }
-
-  return `submission-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  return "sub_" + Date.now() + "_" + Math.random().toString(36).slice(2, 8);
 }
 
-function sanitizeFileName(fileName) {
-  return fileName.replace(/[^a-zA-Z0-9._-]+/g, "-");
-}
-
-function humanizeFirebaseError(error) {
-  switch (error?.code) {
-    case "permission-denied":
-    case "storage/unauthorized":
-      return "Firebase permissions are blocking the request. Check Firestore and Storage rules.";
-    case "storage/canceled":
-      return "The file upload was canceled.";
-    case "storage/retry-limit-exceeded":
-      return "Firebase Storage stopped retrying. Check that Storage is enabled, the bucket is correct, and your connection is stable.";
-    case "storage/quota-exceeded":
-      return "The Firebase Storage quota has been exceeded.";
-    case "unavailable":
-      return "Firebase is temporarily unavailable.";
-    case "upload-timeout":
-      return "The upload took too long and timed out.";
-    default:
-      return error?.message || "An unexpected Firebase error occurred.";
-  }
-}
-
-function withTimeout(promise, timeoutMs, message) {
-  return new Promise((resolve, reject) => {
-    const timer = window.setTimeout(() => {
-      const error = new Error(message);
-      error.code = "upload-timeout";
-      reject(error);
-    }, timeoutMs);
-
-    promise
-      .then((value) => {
-        window.clearTimeout(timer);
-        resolve(value);
-      })
-      .catch((error) => {
-        window.clearTimeout(timer);
-        reject(error);
-      });
-  });
-}
-
-function validateFiles(files) {
-  const oversizedFile = files.find((file) => file.size > MAX_FILE_SIZE_BYTES);
-  if (oversizedFile) {
-    return {
-      valid: false,
-      message: `${oversizedFile.name} is too large. The max size is ${formatFileSize(MAX_FILE_SIZE_BYTES)} per file.`,
-    };
-  }
-
-  const totalSize = files.reduce((sum, file) => sum + file.size, 0);
-  if (totalSize > MAX_TOTAL_SIZE_BYTES) {
-    return {
-      valid: false,
-      message: `The selected files are too large. The total max size is ${formatFileSize(MAX_TOTAL_SIZE_BYTES)}.`,
-    };
-  }
-
-  return { valid: true, message: "" };
-}
-
-function syncFileInput(files) {
-  try {
-    if (typeof window.DataTransfer !== "function") {
-      throw new Error("DataTransfer is not supported.");
-    }
-
-    const dataTransfer = new window.DataTransfer();
-    files.forEach((file) => {
-      dataTransfer.items.add(file);
-    });
-    fileInput.files = dataTransfer.files;
-  } catch (_error) {
-    if (!files.length) {
-      fileInput.value = "";
+async function uploadFileToFirebase(file, submissionId) {
+  let lastError = null;
+  for (const storageService of storageServices) {
+    try {
+      const storageRef = storageService.ref();
+      const fileRef = storageRef.child("submissions/" + submissionId + "/" + file.name);
+      const uploadTask = fileRef.put(file, { contentType: file.type });
+      const snapshot = await Promise.race([
+        new Promise((resolve) => {
+          uploadTask.on("state_changed", null, resolve, () => resolve(uploadTask.snapshot));
+        }),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error("Upload timed out after " + STORAGE_UPLOAD_TIMEOUT_MS / 1000 + "s")), STORAGE_UPLOAD_TIMEOUT_MS)
+        ),
+      ]);
+      const url = await Promise.race([
+        fileRef.getDownloadURL(),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error("Download URL timed out")), STORAGE_DOWNLOAD_URL_TIMEOUT_MS)
+        ),
+      ]);
+      return { name: file.name, url, bucket: storageService.ref().bucket };
+    } catch (error) {
+      lastError = error;
+      console.warn("Firebase upload attempt failed, trying next bucket...", error);
     }
   }
+  throw lastError || new Error("All Firebase storage buckets failed");
 }
 
-function renderFiles() {
-  fileList.innerHTML = "";
-  uploadBox.classList.toggle("has-files", selectedFiles.length > 0);
-
-  if (!selectedFiles.length) {
-    uploadTitle.textContent = "اختر الملفات";
-    uploadCopy.textContent = "اضغط لاختيار الملفات أو اسحبها إلى هذه المساحة.";
-
-    const emptyState = document.createElement("div");
-    emptyState.className = "file-empty";
-    emptyState.textContent = "No files selected yet.";
-    fileList.appendChild(emptyState);
-    return;
-  }
-
-  uploadTitle.textContent = selectedFiles.length === 1
-    ? "تم اختيار ملف واحد"
-    : `تم اختيار ${selectedFiles.length} ملفات`;
-  uploadCopy.textContent = `Ready to upload: ${formatFilesSummary(selectedFiles)}.`;
-
-  selectedFiles.forEach((file) => {
-    const extension = file.name.includes(".")
-      ? file.name.split(".").pop().slice(0, 4)
-      : "file";
-
-    const item = document.createElement("div");
-    const icon = document.createElement("div");
-    const meta = document.createElement("div");
-    const name = document.createElement("strong");
-    const size = document.createElement("span");
-
-    item.className = "file-item";
-    icon.className = "file-icon";
-    meta.className = "file-meta";
-    name.className = "file-name";
-    size.className = "file-size";
-
-    icon.textContent = extension;
-    name.textContent = file.name;
-    size.textContent = formatFileSize(file.size);
-
-    meta.append(name, size);
-    item.append(icon, meta);
-    fileList.appendChild(item);
-  });
-}
-
-function showStatus(message, type) {
-  statusMessage.textContent = message;
-  statusMessage.className = `status-message ${type}`;
-}
-
-function clearStatus() {
-  statusMessage.textContent = "";
-  statusMessage.className = "status-message";
-}
-
+/* ── Form submission ── */
 function validateRequiredFields() {
   const fullName = document.getElementById("fullName");
   const email = document.getElementById("email");
@@ -317,157 +378,46 @@ function validateRequiredFields() {
   const bank = document.getElementById("bank");
   const bereichSuffix = document.getElementById("bereichSuffix");
 
-  [
-    fullName,
-    email,
-    whatsapp,
-    bank,
-    bereichSuffix,
-    ...languageInputs,
-  ].forEach(clearFieldError);
+  let valid = true;
 
-  if (!fullName.value.trim()) {
-    setFieldError(fullName, "المرجو إدخال الاسم الكامل.");
-    fullName.reportValidity();
-    return false;
+  if (!validateName(fullName.value)) {
+    showFieldError(fullName, validateName(fullName.value) || "الاسم الكامل مطلوب");
+    valid = false;
   }
-
-  if (!email.value.trim()) {
-    setFieldError(email, "المرجو إدخال البريد الإلكتروني.");
-    email.reportValidity();
-    return false;
+  if (!validateEmail(email.value)) {
+    showFieldError(email, validateEmail(email.value) || "البريد الإلكتروني مطلوب");
+    valid = false;
   }
-
-  if (!whatsapp.value.trim()) {
-    setFieldError(whatsapp, "المرجو إدخال رقم واتساب.");
-    whatsapp.reportValidity();
-    return false;
+  if (!validateWhatsApp(whatsapp.value)) {
+    showFieldError(whatsapp, validateWhatsApp(whatsapp.value) || "رقم الواتساب مطلوب");
+    valid = false;
   }
-
-  if (!bank.value.trim()) {
-    setFieldError(bank, "المرجو اختيار البنك.");
-    bank.reportValidity();
-    return false;
+  if (!bank.value) {
+    showFieldError(bank, "البنك مطلوب");
+    valid = false;
   }
-
   if (!getSelectedLanguageLevel()) {
-    setFieldError(languageInputs[0], "المرجو اختيار مستوى اللغة B1 أو B2.");
-    languageInputs[0].reportValidity();
-    languageInputs[0].focus();
-    return false;
-  }
-
-  if (!bereichSuffix.value.trim()) {
-    setFieldError(bereichSuffix, "المرجو إدخال المجال بعد 'ausbildung als'.");
-    bereichSuffix.reportValidity();
-    return false;
-  }
-
-  if (!selectedFiles.length) {
-    setFieldError(fileInput, "المرجو رفع الوثائق المطلوبة.");
-    fileInput.reportValidity();
-    uploadBox.focus();
-    return false;
-  }
-
-  return true;
-}
-
-function setSubmitting(isSubmitting) {
-  submitButton.disabled = isSubmitting;
-  submitButton.textContent = isSubmitting
-    ? "sending"
-    : "إرسال الاستمارة";
-}
-
-function setFiles(files) {
-  const normalizedFiles = Array.from(files || []);
-  const validation = validateFiles(normalizedFiles);
-
-  if (!validation.valid) {
-    fileInput.setCustomValidity(validation.message);
-    syncFileInput(selectedFiles);
-    renderFiles();
-    showStatus(validation.message, "error");
-    return false;
-  }
-
-  fileInput.setCustomValidity("");
-  selectedFiles = normalizedFiles;
-  syncFileInput(selectedFiles);
-  renderFiles();
-
-  if (selectedFiles.length) {
-    showStatus(`Files ready: ${formatFilesSummary(selectedFiles)}.`, "loading");
+    languageInputs.forEach((inp) => showFieldError(inp, "اختر مستوى اللغة"));
+    valid = false;
   } else {
-    clearStatus();
+    clearLanguageError();
+  }
+  if (!bereichSuffix.value.trim()) {
+    showFieldError(bereichSuffix, "المجال مطلوب");
+    valid = false;
   }
 
-  return true;
-}
-
-async function uploadFileToFirebase(file, submissionId) {
-  if (!storageServices.length) {
-    throw firebaseInitError || new Error("Firebase Storage is not available.");
-  }
-
-  const safeName = sanitizeFileName(file.name);
-  const storagePath = `applications/${submissionId}/${Date.now()}-${safeName}`;
-  const metadata = file.type ? { contentType: file.type } : undefined;
-  let lastError = null;
-
-  for (const storageService of storageServices) {
-    try {
-      const storageRef = storageService.ref(storagePath);
-
-      await withTimeout(
-        storageRef.put(file, metadata),
-        STORAGE_UPLOAD_TIMEOUT_MS,
-        "The file upload stayed pending for too long. Check Firebase Storage and your connection.",
-      );
-
-      const downloadURL = await withTimeout(
-        storageRef.getDownloadURL(),
-        STORAGE_DOWNLOAD_URL_TIMEOUT_MS,
-        "The file was uploaded, but Firebase did not return a download URL in time.",
-      );
-
-      return {
-        name: file.name,
-        size: file.size,
-        contentType: file.type || "",
-        storagePath,
-        downloadURL,
-      };
-    } catch (error) {
-      lastError = error;
-    }
-  }
-
-  throw lastError || new Error("The file upload failed.");
-}
-
-function resetFormState() {
-  form.reset();
-  selectedFiles = [];
-  fileInput.setCustomValidity("");
-  syncFileInput(selectedFiles);
-  syncLanguageChoices();
-  renderFiles();
+  return valid;
 }
 
 async function handleSubmission() {
-  if (firebaseInitError || !db || !storageServices.length) {
-    showStatus(
-      `Firebase initialization failed. ${humanizeFirebaseError(firebaseInitError)}`,
-      "error",
-    );
+  if (firebaseInitError) {
+    showStatus("Firebase initialization failed. " + humanizeFirebaseError(firebaseInitError), "error");
     return;
   }
 
-  if (!validateRequiredFields() || !form.checkValidity()) {
+  if (!validateRequiredFields()) {
     showStatus("المرجو إكمال جميع الحقول المطلوبة قبل الإرسال.", "error");
-    form.reportValidity();
     return;
   }
 
@@ -491,14 +441,13 @@ async function handleSubmission() {
     let uploadError = null;
 
     for (let index = 0; index < files.length; index += 1) {
-      showStatus(`Uploading file ${index + 1} of ${files.length}...`, "loading");
-
+      showStatus("Uploading file " + (index + 1) + " of " + files.length + "...", "loading");
       try {
         uploadedDocuments.push(await uploadFileToFirebase(files[index], submissionId));
       } catch (error) {
         uploadError = {
-          code: error?.code || "unknown",
-          message: error?.message || "Unknown Firebase upload error",
+          code: error ? error.code || "unknown" : "unknown",
+          message: error ? error.message || "Unknown Firebase upload error" : "Unknown error",
         };
         break;
       }
@@ -518,98 +467,137 @@ async function handleSubmission() {
 
     if (uploadError) {
       showStatus(
-        `Saved form data to Firebase. File upload failed: ${humanizeFirebaseError(uploadError)} Record ID: ${docRef.id}`,
-        "error",
+        "Saved form data to Firebase. File upload failed: " + humanizeFirebaseError(uploadError) + " Record ID: " + docRef.id,
+        "error"
       );
       return;
     }
 
-    showStatus(`.تم الحفظ بنجاح`, "success");
+    showStatus(".تم الحفظ بنجاح", "success");
+
+    /* Dispatch success event for React overlay */
+    window.dispatchEvent(new CustomEvent("formSubmissionSuccess"));
   } catch (error) {
     console.error("Firebase save failed", {
-      code: error?.code,
-      message: error?.message,
-      serverResponse: error?.serverResponse,
-      stack: error?.stack,
+      code: error ? error.code : undefined,
+      message: error ? error.message : undefined,
+      serverResponse: error ? error.serverResponse : undefined,
+      stack: error ? error.stack : undefined,
     });
-
-    showStatus(`Firebase save failed. ${humanizeFirebaseError(error)}`, "error");
+    showStatus("Firebase save failed. " + humanizeFirebaseError(error), "error");
   } finally {
     setSubmitting(false);
   }
 }
 
-form.addEventListener("change", (event) => {
-  if (event.target === fileInput) {
-    return;
-  }
+function resetFormState() {
+  selectedFiles = [];
+  if (fileInput) fileInput.value = "";
+  renderFiles();
+  updateTotalSizeBar();
+}
 
+/* ── File input ── */
+function setFiles(fileListObj) {
+  selectedFiles = [];
+  for (let i = 0; i < fileListObj.length; i += 1) {
+    selectedFiles.push(fileListObj[i]);
+  }
+  renderFiles();
+}
+
+/* ── Event Listeners ── */
+form.addEventListener("change", function (event) {
+  if (event.target === fileInput) return;
   if (event.target instanceof HTMLInputElement && event.target.name === "languageLevel") {
     clearLanguageError();
     syncLanguageChoices();
     return;
   }
-
   if (event.target instanceof HTMLInputElement || event.target instanceof HTMLSelectElement) {
     clearFieldError(event.target);
   }
-
   syncLanguageChoices();
 });
 
-form.addEventListener("input", (event) => {
+form.addEventListener("input", function (event) {
   if (event.target instanceof HTMLInputElement || event.target instanceof HTMLSelectElement) {
     clearFieldError(event.target);
   }
 });
 
-fileInput.addEventListener("change", () => {
+/* Inline validation on blur */
+if (document.getElementById("fullName")) {
+  document.getElementById("fullName").addEventListener("blur", function () {
+    validateField(this, validateName);
+  });
+}
+if (document.getElementById("email")) {
+  document.getElementById("email").addEventListener("blur", function () {
+    validateField(this, validateEmail);
+  });
+}
+if (whatsappInput) {
+  whatsappInput.addEventListener("blur", function () {
+    validateField(this, validateWhatsApp);
+  });
+  /* Auto-format WhatsApp on input */
+  whatsappInput.addEventListener("input", function (e) {
+    const cursorPos = this.selectionStart;
+    const oldLen = this.value.length;
+    const formatted = formatWhatsApp(this.value);
+    this.value = formatted;
+    const newLen = formatted.length;
+    const diff = newLen - oldLen;
+    this.setSelectionRange(cursorPos + diff, cursorPos + diff);
+  });
+}
+
+fileInput.addEventListener("change", function () {
   setFiles(fileInput.files);
 });
 
-uploadBox.addEventListener("keydown", (event) => {
-  if (event.key !== "Enter" && event.key !== " ") {
-    return;
-  }
-
+uploadBox.addEventListener("keydown", function (event) {
+  if (event.key !== "Enter" && event.key !== " ") return;
   event.preventDefault();
   fileInput.click();
 });
 
-languageChoiceCards.forEach((card) => {
-  card.addEventListener("click", () => {
+languageChoiceCards.forEach(function (card) {
+  card.addEventListener("click", function () {
     selectLanguageChoice(card.querySelector('input[name="languageLevel"]'));
   });
 });
 
-languageInputs.forEach((input) => {
-  input.addEventListener("change", () => {
+languageInputs.forEach(function (input) {
+  input.addEventListener("change", function () {
     selectLanguageChoice(input);
   });
 });
 
-uploadBox.addEventListener("dragover", (event) => {
+/* Drag-and-drop with enhanced visual feedback */
+uploadBox.addEventListener("dragover", function (event) {
   event.preventDefault();
   uploadBox.classList.add("is-dragover");
 });
 
-uploadBox.addEventListener("dragleave", () => {
+uploadBox.addEventListener("dragleave", function () {
   uploadBox.classList.remove("is-dragover");
 });
 
-uploadBox.addEventListener("drop", (event) => {
+uploadBox.addEventListener("drop", function (event) {
   event.preventDefault();
   uploadBox.classList.remove("is-dragover");
-
-  if (event.dataTransfer?.files?.length) {
+  if (event.dataTransfer && event.dataTransfer.files && event.dataTransfer.files.length) {
     setFiles(event.dataTransfer.files);
   }
 });
 
-form.addEventListener("submit", async (event) => {
+form.addEventListener("submit", async function (event) {
   event.preventDefault();
   await handleSubmission();
 });
 
+/* Init */
 syncLanguageChoices();
 renderFiles();
