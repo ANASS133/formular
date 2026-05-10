@@ -20,11 +20,7 @@ const FAQ_ITEMS = [
   },
   {
     q: "شحال كاتاخد العملية من البداية حتى الإرسال؟",
-    a: "من اللحظة اللي كاتصيفط لينا الوثائق كاملة، العملية كاتاخد من 3 إلى 7 أيام عمل باش نجهزو كلشي ونبداو فالإرسال.",
-  },
-  {
-    q: "واش مضمون نوصل لشي مقابلة ولا عقد؟",
-    a: "حنا كنضمنو ليك أنو غادي توصلك ردود وتفاعلات من الشركات. إلا ما وصل حتى تفاعل أولي، كنزيدو نرسلو دفعة إضافية مركزة فابور.",
+    a: "من اللحظة اللي كاتصيفط لينا الوثائق كاملة، العملية كاتاخد من 24 ساعة عمل باش نجهزو كلشي ونبداو فالإرسال.",
   },
   {
     q: "شنو الوثائق اللي خاصني نصيفط؟",
@@ -41,6 +37,7 @@ const TESTIMONIALS = [
     level: "B2",
     avatar: "م",
     avatarBg: "#f59e0b",
+    stars: 5,
   },
   {
     text: "المعاملة كانت مزيانة والتنظيم دياولهم عجبني. الفريق تابع معايا خطوة بخطوة حتى تأكد بلي كاين تفاعل.",
@@ -49,6 +46,7 @@ const TESTIMONIALS = [
     level: "B1",
     avatar: "ف",
     avatarBg: "#3b82f6",
+    stars: 4,
   },
   {
     text: "خدمتهم نقية وصافي. أنا شخصياً وصلت لمقابلة ف أسبوعين من مور ما بداو الإرسال. شكراً ليكم.",
@@ -57,6 +55,7 @@ const TESTIMONIALS = [
     level: "B2",
     avatar: "ي",
     avatarBg: "#10b981",
+    stars: 5,
   },
   {
     text: "التنظيم والتواصل كانو فالمستوى، والـ Anschreiben اللي كتبوه ليا كان مخصص ومضبوط. خدمة محترفة بكل المقاييس.",
@@ -65,6 +64,7 @@ const TESTIMONIALS = [
     level: "B2",
     avatar: "أ",
     avatarBg: "#a855f7",
+    stars: 4,
   },
   {
     text: "فخور بزاف بالنتائج. وصلو ليا عروض من شركات كبيرة ف شتوتغارت وفرانكفورت. شكراً من القلب.",
@@ -73,6 +73,7 @@ const TESTIMONIALS = [
     level: "B1",
     avatar: "ع",
     avatarBg: "#ef4444",
+    stars: 5,
   },
   {
     text: "كنت متخوف فالأول ولكن من بعد ما شفت التفاعل والردود اللي وصلو، تأكدت بلي الخدمة مضمونة وفعالة.",
@@ -81,6 +82,7 @@ const TESTIMONIALS = [
     level: "B2",
     avatar: "ن",
     avatarBg: "#06b6d4",
+    stars: 4,
   },
 ];
 
@@ -571,6 +573,7 @@ export default function App() {
                     required
                   />
                 </label>
+<br />
 
                 <label className="field">
                   <span>البريد الإلكتروني</span>
@@ -582,14 +585,12 @@ export default function App() {
                     required
                   />
                 </label>
+<br />
 
                 <label className="field">
                   <span>رقم واتساب</span>
                   <div className="whatsapp-shell">
-                    <span className="whatsapp-prefix">
-                    <Globe size={14} />
-                    +212
-                  </span>
+                
                     <input
                       type="tel"
                       id="whatsapp"
@@ -600,7 +601,7 @@ export default function App() {
                     />
                   </div>
                 </label>
-
+<br />
                 <label className="field" id="bank-label">
                   <span>البنك</span>
                   <CustomSelect
@@ -615,6 +616,7 @@ export default function App() {
                     ]}
                   />
                 </label>
+  <br />
 
                 <div className="wizard-nav">
                   <button
@@ -783,8 +785,8 @@ export default function App() {
                     <svg key={j} width="16" height="16" viewBox="0 0 20 20" className="star-icon">
                       <defs>
                         <linearGradient id={`ts-gold-${i}-${j}`} x1="0%" y1="0%" x2="100%" y2="100%">
-                          <stop offset="0%" stopColor="#fbbf24" />
-                          <stop offset="100%" stopColor="#f59e0b" />
+                          <stop offset="0%" stopColor={j < t.stars ? "#fbbf24" : "#4b5563"} />
+                          <stop offset="100%" stopColor={j < t.stars ? "#f59e0b" : "#374151"} />
                         </linearGradient>
                       </defs>
                       <path
