@@ -826,7 +826,7 @@ export default function App() {
           </div>
           <span className="social-proof-count">
             <ShieldCheck size={14} className="social-cert-icon" />
-            +300 مستفيد وثقو فينا
+            +1000 مستفيد وثقو فينا
           </span>
         </div>
       </section>
