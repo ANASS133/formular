@@ -353,7 +353,7 @@ export default function App() {
                   <Package size={18} /> شوف الباقات
                 </button>
                 <a
-                  href="https://wa.me/212699771759"
+                  href="https://wa.me/212705933245"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="btn btn-secondary"
@@ -451,7 +451,7 @@ export default function App() {
                 <span className="pack-tag">Silver</span>
               </div>
               <div className="pack-price">
-                                <strong>250</strong>
+                                <strong>200</strong>
                 <span className="currency">درهم</span>
               </div>
               <ul className="pack-features">
@@ -862,7 +862,7 @@ export default function App() {
       {/* ── Footer ── */}
       {/* ── Floating WhatsApp Button ── */}
       <a
-        href="https://wa.me/212699771759"
+        href="https://wa.me/212705933245"
         target="_blank"
         rel="noopener noreferrer"
         className="whatsapp-float"
@@ -878,7 +878,7 @@ export default function App() {
         <p>© {new Date().getFullYear()} نحو ألمانيا — Von Marokko nach Deutschland</p>
         <p>جميع الحقوق محفوظة</p>
         <a
-          href="https://wa.me/212699771759"
+          href="https://wa.me/212705933245"
           target="_blank"
           rel="noopener noreferrer"
           className="footer-whatsapp"
