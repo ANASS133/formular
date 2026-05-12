@@ -1,0 +1,40 @@
+        <p class="intro" id="intro-text">دخل معلوماتك، اختار الباقة المناسبة، ورفع الوثائق ديالك باش نبداو الخدمة بشكل منظم وسريع.</p>
+    </div>
+
+    <!-- Packs Selection (translated from App.jsx) -->
+    <div id="pack-selection" style="display: block;">
+        <div class="packs">
+          <div class="pack silver" onclick="selectBewerbungPack('500 Bewerbung')">
+            <div class="pack-header">
+              <h3 class="pack-title">500 Bewerbung</h3>
+              <div class="pack-price">250<span>dh</span></div>
+            </div>
+            <ul class="pack-features">
+              <li> إنشاء سيرة ذاتية إحترافية <span class="check-icon">✓</span></li>
+              <li> كتابة رسالة تحفيزية <span class="check-icon">✓</span></li>
+              <li> دفع 500 سيرة ذاتية <span class="check-icon">✓</span></li>
+              <li class="disabled"> التدريب على المقابلات المباشرة <span class="cross-icon">−</span></li>
+            </ul>
+            <button class="cta-btn silver-btn" style="width: 100%;">إختيار هذا العرض</button>
+          </div>
+
+          <div class="pack gold popular" onclick="selectBewerbungPack('1000 Bewerbung')">
+            <div class="popular-ribbon">الأكثر طلباً</div>
+            <div class="pack-header">
+              <h3 class="pack-title">1000 Bewerbung</h3>
+              <div class="pack-price">350<span>dh</span></div>
+            </div>
+            <ul class="pack-features">
+              <li> إنشاء سيرة ذاتية إحترافية <span class="check-icon">✓</span></li>
+              <li> كتابة رسالة تحفيزية <span class="check-icon">✓</span></li>
+              <li> دفع 1000 سيرة ذاتية <span class="check-icon">✓</span></li>
+              <li> التدريب على المقابلات المباشرة <span class="check-icon">✓</span></li>
+            </ul>
+            <button class="cta-btn gold-btn" style="width: 100%;">إختيار هذا العرض</button>
+          </div>
+        </div>
+    </div>
+
+    <!-- The actual Form -->
+    <div id="form-wrapper" style="display: none;">
+        <!-- Progress bar -->

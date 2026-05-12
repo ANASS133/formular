@@ -8,6 +8,9 @@ import {
 import "./styles.css";
 import CustomSelect from "./CustomSelect";
 
+import { initFormHandler } from "./formHandler.js";
+import Form from "./form.jsx";
+
 /* ── FAQ data ── */
 const FAQ_ITEMS = [
   {
@@ -94,6 +97,8 @@ export default function App() {
   const [submitted, setSubmitted] = useState(false);
   const [faqOpen, setFaqOpen] = useState(null);
   const [featureVisible, setFeatureVisible] = useState([]);
+  const [uploadFiles, setUploadFiles] = useState([]);
+  const [uploadTotalSize, setUploadTotalSize] = useState(0);
 
   const formRef = useRef(null);
   const featureRefs = useRef([]);
@@ -195,42 +200,26 @@ export default function App() {
     setSubmitted(false);
     setSelectedPack(null);
     setCurrentStep(1);
+    setUploadFiles([]);
+    setUploadTotalSize(0);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
-  /* ── Listen for form submit success from public/script.js ── */
+  /* ── Listen for form submit success from formHandler ── */
   useEffect(() => {
-    const handler = () => setSubmitted(true);
+    const handler = () => {
+      setUploadFiles([]);
+      setUploadTotalSize(0);
+      setSubmitted(true);
+    };
     window.addEventListener("formSubmissionSuccess", handler);
     return () => window.removeEventListener("formSubmissionSuccess", handler);
   }, []);
 
-  /* ── Firebase scripts (lazy: only load when form section mounts) ── */
+  /* ── Form handler (binds upload logic after form mounts) ── */
   useEffect(() => {
     if (!selectedPack) return;
-
-    const scriptSources = [
-      "https://www.gstatic.com/firebasejs/12.7.0/firebase-app-compat.js",
-      "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore-compat.js",
-      "https://www.gstatic.com/firebasejs/12.7.0/firebase-storage-compat.js",
-      "/script.js",
-    ];
-
-    const addedScripts = scriptSources.map((src) => {
-      const script = document.createElement("script");
-      script.src = src;
-      script.async = false;
-      document.body.appendChild(script);
-      return script;
-    });
-
-    return () => {
-      addedScripts.forEach((script) => {
-        if (script.parentNode) {
-          script.parentNode.removeChild(script);
-        }
-      });
-    };
+    initFormHandler();
   }, [selectedPack]);
 
   /* ── Render ── */
@@ -531,244 +520,17 @@ export default function App() {
         </div>
       </section>
 
-      {/* ── Form Section ── */}
-      <section
-        ref={formRef}
-        className={`form-section${selectedPack ? " expanded" : ""}`}
-        id="contact"
-      >
-        <main className="page-shell">
-          <section className="form-panel">
-            <div className="panel-copy">
-              <h2>عمّر الاستمارة وخلي فريقنا يتكلف بالباقي</h2>
-              <p className="intro">
-                دخل معلوماتك، اختار الباقة المناسبة، ورفع الوثائق ديالك باش نبداو
-                الخدمة بشكل منظم وسريع.
-              </p>
-            </div>
-
-            {/* Progress bar */}
-            <div className="progress-bar">
-              {[1, 2, 3].map((step) => (
-                <div
-                  key={step}
-                  className={`progress-step${step === currentStep ? " active" : ""}${step < currentStep ? " done" : ""}`}
-                />
-              ))}
-            </div>
-            <div className="step-counter">
-              الخطوة {currentStep} من 3
-            </div>
-
-            <form id="candidate-form" className="candidate-form" noValidate>
-              {/* Step 1: Personal Info */}
-              <div className={`wizard-step${currentStep === 1 ? " active" : ""}`}>
-                <label className="field">
-                  <span>الاسم الكامل</span>
-                  <input
-                    type="text"
-                    id="fullName"
-                    name="fullName"
-                    placeholder="أدخل الاسم الكامل"
-                    required
-                  />
-                </label>
-<br />
-
-                <label className="field">
-                  <span>البريد الإلكتروني</span>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    placeholder="name@example.com"
-                    required
-                  />
-                </label>
-<br />
-
-                <label className="field">
-                  <span>رقم واتساب</span>
-                  <div className="whatsapp-shell">
-                
-                    <input
-                      type="tel"
-                      id="whatsapp"
-                      name="whatsapp"
-                      placeholder="6XX XXX XXX"
-                      required
-                      dir="ltr"
-                    />
-                  </div>
-                </label>
-<br />
-                <label className="field" id="bank-label">
-                  <span>البنك</span>
-                  <CustomSelect
-                    name="bank"
-                    placeholder="اختر البنك"
-                    required
-                    defaultValue=""
-                    options={[
-                      { value: "البنك الشعبي", label: "البنك الشعبي" },
-                      { value: "CIH", label: "CIH" },
-                      { value: "كاش بلوس", label: "كاش بلوس" },
-                    ]}
-                  />
-                </label>
-  <br />
-
-                <div className="wizard-nav">
-                  <button
-                    type="button"
-                    className="wizard-next"
-                    onClick={() => setCurrentStep(2)}
-                  >
-                    التالي
-                  </button>
-                </div>
-              </div>
-
-              {/* Step 2: Language & Field */}
-              <div className={`wizard-step${currentStep === 2 ? " active" : ""}`}>
-                <fieldset className="field">
-                  <legend>هل لديك مستوى B1 أو B2؟</legend>
-                  <div className="option-grid">
-                    <label className="choice-card">
-                      <input
-                        type="radio"
-                        name="languageLevel"
-                        value="B1"
-                        required
-                      />
-                      <span>B1</span>
-                    </label>
-                    <label className="choice-card">
-                      <input
-                        type="radio"
-                        name="languageLevel"
-                        value="B2"
-                        required
-                      />
-                      <span>B2</span>
-                    </label>
-                  </div>
-                  <p
-                    className="language-proof"
-                    id="language-proof"
-                    aria-live="polite"
-                  />
-                </fieldset>
-
-                <label className="field">
-                  <span>المجال</span>
-                  <div className="prefix-shell">
-                    <span className="prefix-label">ausbildung als</span>
-                    <input
-                      type="text"
-                      id="bereichSuffix"
-                      name="bereichSuffix"
-                      placeholder="مثال: pflege, it, logistik"
-                      required
-                    />
-                  </div>
-                  <small>البداية ثابتة ولا يمكن تغييرها.</small>
-                </label>
-
-                <div className="wizard-nav">
-                  <button
-                    type="button"
-                    className="wizard-prev"
-                    onClick={() => setCurrentStep(1)}
-                  >
-                    السابق
-                  </button>
-                  <button
-                    type="button"
-                    className="wizard-next"
-                    onClick={() => setCurrentStep(3)}
-                  >
-                    التالي
-                  </button>
-                </div>
-              </div>
-
-              {/* Step 3: Documents + Submit */}
-              <div className={`wizard-step${currentStep === 3 ? " active" : ""}`}>
-                <input
-                  type="hidden"
-                  id="bewerbungen"
-                  name="bewerbungen"
-                  value={selectedPack || ""}
-                />
-
-                <div className="field field-upload">
-                  <span>رفع الوثائق</span>
-
-                  <input
-                    className="file-input"
-                    type="file"
-                    id="documents"
-                    name="documents"
-                    multiple
-                    accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-                  />
-
-                  <label
-                    className="upload-box"
-                    htmlFor="documents"
-                    id="upload-box"
-                    tabIndex={0}
-                  >
-                    <span className="upload-badge">الوثائق</span>
-                    <strong>اختر الملفات</strong>
-                    <span className="upload-copy">
-                      اضغط لاختيار الملفات أو اسحبها إلى هذه المساحة.
-                    </span>
-                    <span className="upload-button">اختيار الملفات</span>
-                  </label>
-
-                  <small>
-                    الأنواع المقبولة: PDF و DOC و DOCX و JPG و PNG. الحد الأقصى 10
-                    MB لكل ملف و 25 MB للمجموع.
-                  </small>
-                </div>
-
-                <div className="file-list" id="file-list" aria-live="polite" />
-                <div className="total-size-bar" id="total-size-bar" style={{ display: "none" }}>
-                  <div className="total-size-label">
-                    <span id="total-size-text">0 MB / 25 MB</span>
-                    <span id="total-size-pct">0%</span>
-                  </div>
-                  <div className="total-size-track">
-                    <div className="total-size-fill" id="total-size-fill" style={{ width: "0%" }} />
-                  </div>
-                </div>
-
-                <p
-                  className="status-message"
-                  id="status-message"
-                  aria-live="polite"
-                />
-
-                <div className="wizard-nav">
-                  <button
-                    type="button"
-                    className="wizard-prev"
-                    onClick={() => setCurrentStep(2)}
-                  >
-                    السابق
-                  </button>
-                  <button type="submit" className="submit-button">
-                    إرسال الاستمارة
-                  </button>
-                </div>
-              </div>
-            </form>
-          </section>
-        </main>
-      </section>
-
+{/* form */}
+<Form
+  formRef={formRef}
+  selectedPack={selectedPack}
+  currentStep={currentStep}
+  setCurrentStep={setCurrentStep}
+  uploadFiles={uploadFiles}
+  setUploadFiles={setUploadFiles}
+  uploadTotalSize={uploadTotalSize}
+  setUploadTotalSize={setUploadTotalSize}
+/>
       {/* ── Testimonials ── */}
       <section className="testimonials-section">
         <h2 className="section-title">

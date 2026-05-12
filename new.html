@@ -1,0 +1,485 @@
+﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نموذج التسجيل</title>
+    <!-- Import Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Import Design -->
+    <link rel="stylesheet" href="src/styles.css">
+</head>
+<body>
+
+<!-- Packs Selection -->
+<section class="hero" id="pack-selection">
+  <div class="hero-card" style="background: transparent; box-shadow: none; border: none; padding-top: 20px;">
+    <div style="text-align: center; margin-bottom: 30px;">
+        <h2 style="font-size: 2rem; color: var(--color-text);">اختر الباقة المناسبة</h2>
+        <p style="color: var(--color-muted); font-size: 1rem; margin-top: 10px;">حدد الباقة اللي تناسبك باش نكملو التسجيل.</p>
+    </div>
+    <div class="packs">
+      <div class="pack silver" onclick="selectBewerbungPack('500 Bewerbung')">
+        <div class="pack-header">
+          <h3>500 bewerbung</h3>
+          <span class="pack-tag">Silver</span>
+        </div>
+        <div class="pack-price">
+            <strong>200</strong>
+            <span class="currency">درهم</span>
+        </div>
+        <ul class="pack-features">
+          <li>500 طلب</li>
+          <li>تصحيح السيرة الذاتية</li>
+          <li><strong>anschreiben خاص بكل شركة</strong></li>
+          <li>ماكطيحوش ف spam</li>
+          <li>اخر العروض من جميع المواقع الالمانية</li>
+        </ul>
+        <button type="button" class="cta-btn" onclick="event.stopPropagation(); selectBewerbungPack('500 Bewerbung');">تسجيل</button>
+      </div>
+
+      <div class="pack gold popular" onclick="selectBewerbungPack('1000 Bewerbung')">
+        <div class="popular-ribbon">
+          <span>BEST SELLER</span>
+        </div>
+        <div class="pack-header">
+          <h3>1000 bewerbung</h3>
+          <span class="pack-tag">Gold</span>
+        </div>
+        <div class="pack-price">
+            <strong>400</strong>
+            <span class="currency">درهم</span>
+            <span class="strike">500</span>
+        </div>
+        <ul class="pack-features">
+          <li>1000 طلب</li>
+          <li>تصحيح السيرة الذاتية</li>
+          <li><strong>anschreiben خاص بكل شركة</strong></li>
+          <li>دعم مخصص</li>
+          <li>ماكطيحوش ف spam</li>
+          <li>اخر العروض من جميع المواقع الالمانية</li>
+        </ul>
+        <button type="button" class="cta-btn accent" onclick="event.stopPropagation(); selectBewerbungPack('1000 Bewerbung');">تسجيل</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- The actual Form -->
+<section class="form-section expanded" id="form-wrapper" style="display: none; min-height: 100vh; background: transparent;">
+  <main class="page-shell">
+    <section class="form-panel" style="margin-top: 20px;">
+        <div class="panel-copy">
+            <h2>عمّر الاستمارة وخلي فريقنا يتكلف بالباقي</h2>
+            <p class="intro">
+                دخل معلوماتك، اختار الباقة المناسبة، ورفع الوثائق ديالك باش نبداو الخدمة بشكل منظم وسريع.
+            </p>
+        </div>
+
+        <!-- Selected Pack Info -->
+        <div id="selected-pack-display" style="background: var(--color-primary-soft); color: var(--color-primary); padding: 12px 16px; border-radius: var(--radius-sm); margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--color-primary-glow);">
+            <span id="selected-pack-text" style="font-weight: 700; font-size: 1.1rem;">الباقة المختارة: </span>
+            <button type="button" onclick="changePack()" style="background: none; border: none; color: var(--color-primary); text-decoration: underline; cursor: pointer; font-family: inherit; font-size: 0.9rem;">تغيير الباقة</button>
+        </div>
+
+        <!-- Progress bar -->
+        <div class="progress-bar">
+            <div class="progress-step active" id="prog-1"></div>
+            <div class="progress-step" id="prog-2"></div>
+            <div class="progress-step" id="prog-3"></div>
+        </div>
+        <div class="step-counter" id="step-counter">الخطوة 1 من 3</div>
+
+        <form id="applicationForm" class="candidate-form">
+            <input type="hidden" id="selected_pack" value="">
+            
+            <!-- Step 1 -->
+            <div class="wizard-step active" id="step-1" style="animation: stepIn 350ms var(--ease-out) both;">
+                <label class="field">
+                    <span>الاسم الكامل</span>
+                    <input type="text" id="full_name" placeholder="أدخل الاسم الكامل" required>
+                </label>
+                <br />
+
+                <label class="field">
+                    <span>البريد الإلكتروني</span>
+                    <input type="email" id="email" placeholder="name@example.com" required>
+                </label>
+                <br />
+
+                <label class="field">
+                    <span>رقم واتساب</span>
+                    <div class="whatsapp-shell">
+                        <input type="tel" id="whatsapp" placeholder="6XX XXX XXX" required dir="ltr">
+                    </div>
+                </label>
+                <br />
+
+                <label class="field" style="margin-bottom: 10px;">
+                    <span>البنك</span>
+                    <select id="bank" required style="width: 100%; height: 50px; border: 1px solid var(--color-border); border-radius: var(--radius-sm); padding: 0 16px; background: var(--color-surface); color: var(--color-text); outline: none;">
+                        <option value="">-- اختر البنك --</option>
+                        <option value="CIH">CIH</option>
+                        <option value="Chaabi">البنك الشعبي</option>
+                        <option value="Attijari">التجاري وفا بنك</option>
+                        <option value="Other">بنك آخر</option>
+                    </select>
+                </label>
+                <br />
+
+                <div class="wizard-nav">
+                    <button type="button" class="wizard-next" onclick="nextStep(2)">التالي</button>
+                </div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="wizard-step" id="step-2" style="display: none;">
+                <fieldset class="field" style="border: none; margin: 0; padding: 0;">
+                    <span style="font-size: 0.9rem; margin-bottom: 8px; display: block;">هل لديك مستوى B1 أو B2؟</span>
+                    <div class="option-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                        <label class="choice-card" style="display: flex; align-items: center; justify-content: center; height: 60px; border: 1px solid var(--color-border); border-radius: var(--radius-sm); cursor: pointer; transition: 0.2s;">
+                            <input type="radio" name="language_level" value="B1" required onchange="updateRadioStyles()" style="display: none;">
+                            <span>B1</span>
+                        </label>
+                        <label class="choice-card" style="display: flex; align-items: center; justify-content: center; height: 60px; border: 1px solid var(--color-border); border-radius: var(--radius-sm); cursor: pointer; transition: 0.2s;">
+                            <input type="radio" name="language_level" value="B2" required onchange="updateRadioStyles()" style="display: none;">
+                            <span>B2</span>
+                        </label>
+                    </div>
+                </fieldset>
+
+                <label class="field" style="margin-top: 20px; margin-bottom: 10px;">
+                    <span>المجال</span>
+                    <div class="prefix-shell" style="display: flex; align-items: stretch; border: 1px solid var(--color-border); border-radius: var(--radius-sm); overflow: hidden; background: var(--color-surface);">
+                        <span class="prefix-label" style="padding: 0 16px; background: rgba(0,0,0,0.2); display: flex; align-items: center; font-size: 0.85rem; color: var(--color-muted);">ausbildung als</span>
+                        <input type="text" id="field" placeholder="مثال: pflege, it, logistik" required style="border: none; height: 50px; flex: 1; padding: 0 16px; background: transparent; outline: none; color: var(--color-text);">
+                    </div>
+                    <small style="color: var(--color-muted); font-size: 0.8rem; margin-top: 4px;">البداية ثابتة ولا يمكن تغييرها.</small>
+                </label>
+
+                <div class="wizard-nav">
+                    <button type="button" class="wizard-prev" onclick="prevStep(1)">السابق</button>
+                    <button type="button" class="wizard-next" onclick="nextStep(3)">التالي</button>
+                </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="wizard-step" id="step-3" style="display: none;">
+                <div class="field field-upload">
+                    <span>رفع الوثائق (Lebenslauf, Anschreiben, Zeugnisse...)</span>
+
+                    <input class="file-input" type="file" id="documents" multiple accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" style="position: absolute; opacity: 0; width: 0; height: 0;">
+
+                    <label class="upload-box" for="documents" id="upload-box" style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 35px 20px; border: 2px dashed var(--color-border-strong); background: var(--color-surface); border-radius: var(--radius-md); transition: 0.3s; cursor: pointer; margin-top: 8px;">
+                        <span class="upload-badge" style="background: var(--color-primary-soft); color: var(--color-primary); padding: 4px 14px; border-radius: 999px; font-size: 0.75rem; font-weight: 800;">اختر الملفات</span>
+                        <strong id="upload-title" style="margin-top: 15px; font-size: 1rem; color: var(--color-text);">اضغط لاختيار الملفات أو اسحبها إلى هذه المساحة</strong>
+                        <span class="upload-copy" id="upload-desc" style="margin: 8px 0 15px; font-size: 0.85rem; color: var(--color-muted);">اختيار الملفات (PDF, DOCX...)</span>
+                        <span class="upload-button" style="pointer-events: none; min-height: 40px; padding: 0 20px; font-size: 0.85rem;"></span>
+                    </label>
+
+                    <small style="color: var(--color-muted); font-size: 0.75rem; margin-top: 10px; display: block;">
+                        الأنواع المقبولة: PDF، DOC، DOCX، JPG، PNG. الحد الأقصى 10MB لكل ملف و 25MB للمجموع.
+                    </small>
+                </div>
+
+                <div class="wizard-nav" style="margin-top: 30px;">
+                    <button type="button" class="wizard-prev" onclick="prevStep(2)">السابق</button>
+                    <button type="submit" class="submit-button" id="submitBtn" style="flex: 2; padding: 12px; font-size: 1.1rem; height: 48px;">إرسال الاستمارة</button>
+                </div>
+                
+                <div id="message" style="margin-top: 15px; font-weight: bold; text-align: center; border-radius: var(--radius-sm); padding: 10px; display: none;"></div>
+            </div>
+        </form>
+    </section>
+  </main>
+</section>
+
+<style>
+@keyframes stepIn {
+  from { opacity: 0; transform: translateX(12px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+.wizard-step.active {
+    display: block !important;
+    animation: stepIn 350ms var(--ease-out) both;
+}
+.prefix-shell:focus-within { border-color: var(--color-primary-glow); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+</style>
+
+<script>
+    // Pack Selection Logic
+    function selectBewerbungPack(packName) {
+        document.getElementById('selected_pack').value = packName;
+        document.getElementById('selected-pack-text').innerText = 'الباقة المختارة: ' + packName;
+        
+        document.getElementById('pack-selection').style.display = 'none';
+        document.getElementById('form-wrapper').style.display = 'block';
+
+        setTimeout(() => {
+            document.getElementById('form-wrapper').scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+            });
+        }, 100);
+    }
+
+    function changePack() {
+        document.getElementById('selected_pack').value = '';
+        document.getElementById('pack-selection').style.display = 'block';
+        document.getElementById('form-wrapper').style.display = 'none';
+    }
+
+    // Navigation Logic within Pure JS (like App.jsx)
+    function nextStep(step) {
+        const currentStepEl = document.querySelector('.wizard-step.active');
+        const inputs = currentStepEl.querySelectorAll('input, select');
+        for (let input of inputs) {
+            if (!input.checkValidity()) {
+                input.reportValidity();
+                return;
+            }
+        }
+        showStep(step);
+    }
+
+    function prevStep(step) {
+        showStep(step);
+    }
+
+    function showStep(step) {
+        document.querySelectorAll('.wizard-step').forEach(el => {
+            el.classList.remove('active');
+            el.style.display = 'none';
+        });
+        
+        const nextStepEl = document.getElementById('step-' + step);
+        nextStepEl.classList.add('active');
+        nextStepEl.style.display = 'block';
+
+        document.querySelectorAll('.progress-step').forEach((el, index) => {
+            el.classList.remove('active', 'done');
+            if (index + 1 === step) el.classList.add('active');
+            if (index + 1 < step) el.classList.add('done');
+        });
+
+        document.getElementById('step-counter').innerText = 'الخطوة ' + step + ' من 3';
+    }
+
+    // Radio button styling exactly like the React App
+    function updateRadioStyles() {
+        document.querySelectorAll('.choice-card').forEach(card => {
+            if (card.querySelector('input').checked) {
+                card.style.borderColor = 'var(--color-primary-glow)';
+                card.style.background = 'var(--color-primary-soft)';
+                card.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)';
+            } else {
+                card.style.borderColor = 'var(--color-border)';
+                card.style.background = 'transparent';
+                card.style.boxShadow = 'none';
+            }
+        });
+    }
+
+    // File Input UI Logic
+    const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024;
+    const MAX_TOTAL_SIZE_BYTES = 25 * 1024 * 1024;
+    const ALLOWED_EXTENSIONS = ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png'];
+    const fileInput = document.getElementById('documents');
+    const uploadBox = document.getElementById('upload-box');
+    let selectedFiles = [];
+
+    function updateFileUI() {
+        const title = document.getElementById('upload-title');
+        const desc = document.getElementById('upload-desc');
+        const filesCount = selectedFiles.length;
+        if (filesCount > 0) {
+            title.innerText = "الملفات المختارة";
+            desc.innerText = filesCount + " ملف(ات) مختارة";
+            uploadBox.style.borderColor = 'var(--color-primary)';
+            uploadBox.style.background = 'var(--color-primary-soft)';
+        } else {
+            title.innerText = "اضغط لاختيار الملفات أو اسحبها إلى هذه المساحة";
+            desc.innerText = "اختيار الملفات (PDF, DOCX...)";
+            uploadBox.style.borderColor = 'var(--color-border-strong)';
+            uploadBox.style.background = 'var(--color-surface)';
+        }
+    }
+
+    fileInput.addEventListener('change', (e) => {
+        selectedFiles = Array.from(e.target.files || []);
+        updateFileUI();
+    });
+
+    uploadBox.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadBox.style.borderColor = 'var(--color-primary)';
+        uploadBox.style.background = 'var(--color-primary-soft)';
+    });
+
+    uploadBox.addEventListener('dragleave', updateFileUI);
+
+    uploadBox.addEventListener('drop', (e) => {
+        e.preventDefault();
+        selectedFiles = Array.from(e.dataTransfer.files || []);
+        updateFileUI();
+    });
+
+    // Supabase Configuration
+    const SUPABASE_URL = "https://vaaoosziexlywonrfbvf.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_6A9kpLoCUCYWBF8F0x6CfQ_p6np_N97";
+    const SUPABASE_STORAGE_BUCKET = "applications";
+    const SUPABASE_TABLE = "applications";
+
+    // Initialize Supabase Client
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    function safePathSegment(value) {
+        const cleaned = String(value || 'application')
+            .trim()
+            .toLowerCase()
+            .replace(/[^a-z0-9._-]+/g, '-')
+            .replace(/^-+|-+$/g, '')
+            .slice(0, 80);
+        return cleaned || 'application';
+    }
+
+    function buildStoragePath(file, index, selectedPack) {
+        const ext = (file.name.split('.').pop() || 'file').toLowerCase();
+        const date = new Date().toISOString().slice(0, 10);
+        const original = safePathSegment(file.name.replace(/\.[^.]+$/, ''));
+        const random = window.crypto && window.crypto.randomUUID
+            ? window.crypto.randomUUID()
+            : Math.random().toString(36).slice(2);
+        return safePathSegment(selectedPack) + '/' + date + '/' + Date.now() + '-' + index + '-' + random + '-' + original + '.' + ext;
+    }
+
+    function validateFiles(files) {
+        if (!files.length) throw new Error('المرجو رفع وثيقة واحدة على الأقل.');
+
+        let totalSize = 0;
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            const ext = (file.name.split('.').pop() || '').toLowerCase();
+            if (!ALLOWED_EXTENSIONS.includes(ext)) {
+                throw new Error('نوع الملف غير مقبول: ' + file.name);
+            }
+            if (file.size > MAX_FILE_SIZE_BYTES) {
+                throw new Error('الملف ' + file.name + ' يتجاوز الحد الأقصى 10MB.');
+            }
+            totalSize += file.size;
+        }
+
+        if (totalSize > MAX_TOTAL_SIZE_BYTES) {
+            throw new Error('مجموع حجم الملفات يتجاوز 25MB.');
+        }
+    }
+
+    function explainSupabaseError(error) {
+        const message = error && error.message ? error.message : 'خطأ غير معروف';
+        if (message.includes('row-level security') || message.includes('policy')) {
+            return 'رفض الصلاحيات من Supabase. خاصك تفعّل RLS policies للجدول و Storage bucket.';
+        }
+        if (message.includes('Bucket not found') || message.includes('bucket')) {
+            return 'Bucket باسم applications غير موجود أو الاسم غير مطابق.';
+        }
+        if (message.includes('JWT') || message.includes('token')) {
+            return 'مفتاح Supabase غير صالح.';
+        }
+        if (message.includes('Could not find')) {
+            return 'واحد من أعمدة جدول applications غير موجود. تأكد من أسماء الأعمدة.';
+        }
+        return message;
+    }
+
+    document.getElementById('applicationForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const submitBtn = document.getElementById('submitBtn');
+        const messageEl = document.getElementById('message');
+        
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'جاري الإرسال...';
+        messageEl.style.display = 'block';
+        messageEl.style.color = 'var(--color-text)';
+        messageEl.style.background = 'var(--color-surface)';
+        messageEl.textContent = 'المرجو الانتظار...';
+
+        try {
+            const selectedPack = document.getElementById('selected_pack').value;
+            const fullName = document.getElementById('full_name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const whatsapp = document.getElementById('whatsapp').value.trim();
+            const bank = document.getElementById('bank').value;
+            const languageLevel = document.querySelector('input[name="language_level"]:checked').value;
+            const field = document.getElementById('field').value.trim();
+            const files = selectedFiles.length ? selectedFiles : Array.from(fileInput.files || []);
+
+            if (!selectedPack) throw new Error('خاصك تختار الباقة قبل الإرسال.');
+            validateFiles(files);
+
+            let uploadedDocs = [];
+            let uploadError = null;
+            for (let i = 0; i < files.length; i++) {
+                messageEl.textContent = 'جاري رفع الملف ' + (i + 1) + ' من ' + files.length + '...';
+                const file = files[i];
+                const path = buildStoragePath(file, i, selectedPack);
+                const { data, error } = await supabaseClient.storage
+                    .from(SUPABASE_STORAGE_BUCKET)
+                    .upload(path, file, { contentType: file.type || undefined, upsert: false });
+                if (error) {
+                    uploadError = error;
+                    console.error('Storage upload failed', error);
+                    break;
+                }
+                uploadedDocs.push(data.path);
+            }
+
+            messageEl.textContent = 'جاري حفظ المعلومات...';
+            const { error: dbError } = await supabaseClient.from(SUPABASE_TABLE).insert([{
+                pack: selectedPack,
+                full_name: fullName,
+                email: email,
+                whatsapp: whatsapp,
+                bank: bank,
+                language_level: languageLevel,
+                field: field,
+                documents: uploadedDocs
+            }]);
+
+            if (dbError) throw dbError;
+
+            if (uploadError) {
+                messageEl.style.color = 'var(--color-danger)';
+                messageEl.style.background = 'rgba(239, 68, 68, 0.1)';
+                messageEl.textContent = 'تم حفظ المعلومات، ولكن فشل رفع بعض الملفات: ' + explainSupabaseError(uploadError);
+                return;
+            }
+
+            messageEl.style.color = 'var(--color-success)';
+            messageEl.style.background = 'rgba(34, 197, 94, 0.1)';
+            messageEl.textContent = 'تم الإرسال بنجاح!';
+            document.getElementById('applicationForm').reset();
+            selectedFiles = [];
+            updateRadioStyles();
+            updateFileUI();
+            
+            setTimeout(() => {
+                showStep(1);
+                messageEl.style.display = 'none';
+                changePack();
+            }, 3000);
+
+        } catch (error) {
+            console.error(error);
+            messageEl.style.color = 'var(--color-danger)';
+            messageEl.style.background = 'rgba(239, 68, 68, 0.1)';
+            messageEl.textContent = 'حدث خطأ: ' + explainSupabaseError(error);
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'إرسال الاستمارة';
+        }
+    });
+    
+
+</script>
+</body>
+</html>
