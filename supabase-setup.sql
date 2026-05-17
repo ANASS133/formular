@@ -67,3 +67,60 @@ on storage.objects
 for insert
 to anon
 with check (bucket_id = 'applications');
+
+-- ═══════════════════════════════════════════════════════
+-- Promo / Referral Tracking
+-- ═══════════════════════════════════════════════════════
+
+-- Ensure FK target column exists on applications first
+alter table public.applications add column if not exists code text;
+
+-- Optional FK constraint (runs after column exists)
+do $$ begin
+  if not exists (select 1 from pg_constraint where conname = 'applications_code_fkey') then
+    alter table public.applications add constraint applications_code_fkey foreign key (code) references public.promo(code) on delete set null;
+  end if;
+end $$;
+
+create table if not exists public.promo (
+  id uuid primary key default gen_random_uuid(),
+  code text not null unique,
+  name text,
+  total_clients integer not null default 0,
+  confirmed_clients integer not null default 0,
+  money integer not null default 0,
+  created_at timestamptz not null default now()
+);
+
+alter table public.promo add column if not exists name text;
+alter table public.promo add column if not exists confirmed_clients integer not null default 0;
+alter table public.promo add column if not exists money integer not null default 0;
+
+alter table public.promo enable row level security;
+
+drop policy if exists "Allow public promo reads" on public.promo;
+create policy "Allow public promo reads"
+on public.promo
+for select
+to anon
+using (true);
+
+create or replace function increment_promo_clients(promo_code text)
+returns integer
+language plpgsql
+security definer
+as $$
+declare
+  new_count integer;
+begin
+  update public.promo
+  set total_clients = total_clients + 1
+  where code = promo_code
+  returning total_clients into new_count;
+
+  return coalesce(new_count, 0);
+end;
+$$;
+
+grant execute on function increment_promo_clients(text) to anon;
+grant execute on function increment_promo_clients(text) to authenticated;

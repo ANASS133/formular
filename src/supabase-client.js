@@ -13,6 +13,22 @@ const SUPABASE_STORAGE_BUCKET = "applications";
 // Table name in your Supabase database
 const SUPABASE_TABLE = "applications";
 
+// Promo / referral table
+const PROMO_TABLE = "promo";
+
+// localStorage key the frontend uses to persist an active promo code
+const PROMO_STORAGE_KEY = "active_promo_code";
+
+// Name of the Postgres RPC function that atomically increments total_clients
+const PROMO_RPC = "increment_promo_clients";
+
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-export { supabase, SUPABASE_STORAGE_BUCKET, SUPABASE_TABLE };
+export {
+  supabase,
+  SUPABASE_STORAGE_BUCKET,
+  SUPABASE_TABLE,
+  PROMO_TABLE,
+  PROMO_STORAGE_KEY,
+  PROMO_RPC,
+};

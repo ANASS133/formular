@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef, useCallback } from "react";
+import { useParams } from "react-router-dom";
 import {
   Globe, Sparkles, FileText, Target, Rocket, ShieldCheck,
   Sun, Moon, Check, ChevronDown, Star, MessageCircle,
@@ -10,6 +11,7 @@ import CustomSelect from "./CustomSelect";
 
 import { initFormHandler } from "./formHandler.js";
 import Form from "./form.jsx";
+import { usePromoCode } from "./hooks/usePromoCode.js";
 
 /* ── FAQ data ── */
 const FAQ_ITEMS = [
@@ -90,6 +92,10 @@ const TESTIMONIALS = [
 ];
 
 export default function App() {
+  // ── Promo code from URL ───────────────────────────────────────
+  const { promoCode } = useParams();
+  const { storedCode } = usePromoCode(promoCode);
+
   const [selectedPack, setSelectedPack] = useState(null);
   const [currentStep, setCurrentStep] = useState(1);
   const [lightMode, setLightMode] = useState(false);

@@ -1,4 +1,4 @@
-import { supabase, SUPABASE_STORAGE_BUCKET, SUPABASE_TABLE } from "./supabase-client.js";
+import { supabase, SUPABASE_STORAGE_BUCKET, SUPABASE_TABLE, PROMO_STORAGE_KEY, PROMO_RPC } from "./supabase-client.js";
 
 const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024;
 const MAX_TOTAL_SIZE_BYTES = 25 * 1024 * 1024;
@@ -312,8 +312,12 @@ export function initFormHandler() {
       return;
     }
 
+    // ── Promo code from localStorage (read once, use for both insert + RPC) ──
+    const promoCode = localStorage.getItem(PROMO_STORAGE_KEY);
+
     const payload = {
       pack: selectedPack,
+      code: promoCode || null,
       full_name: getElement("fullName").value.trim(),
       email: getElement("email").value.trim(),
       whatsapp: whatsappInput ? whatsappInput.value.trim() : "",
@@ -355,6 +359,22 @@ export function initFormHandler() {
         ]);
 
       if (dbError) throw dbError;
+
+      // ── Promo Code Increment (non-blocking) ────────────────────
+      if (promoCode) {
+        try {
+          const { error: promoError } = await supabase.rpc(PROMO_RPC, {
+            promo_code: promoCode,
+          });
+          if (promoError) {
+            console.error("Promo increment failed:", promoError);
+          } else {
+            localStorage.removeItem(PROMO_STORAGE_KEY);
+          }
+        } catch (promoErr) {
+          console.error("Promo increment error:", promoErr);
+        }
+      }
 
       if (uploadError) {
         showStatus(
