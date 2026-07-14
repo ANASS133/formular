@@ -7,22 +7,10 @@ export default function Form({
   setCurrentStep,
   uploadFiles,
   setUploadFiles,
-  uploadTotalSize,
-  setUploadTotalSize,
 }) {
-  const maxTotalSize = 25 * 1024 * 1024;
-  const uploadPercent = Math.min((uploadTotalSize / maxTotalSize) * 100, 100);
-  const uploadFillClass =
-    uploadPercent > 90
-      ? "total-size-fill danger"
-      : uploadPercent > 70
-        ? "total-size-fill warning"
-        : "total-size-fill";
-
   const syncSelectedFiles = (files) => {
     const selected = Array.from(files || []);
     setUploadFiles(selected);
-    setUploadTotalSize(selected.reduce((total, file) => total + file.size, 0));
     if (typeof window !== "undefined") {
       window.__formFiles = selected;
     }
@@ -282,23 +270,6 @@ export default function Form({
                   );
                 })}
               </div>
-
-              {uploadFiles.length > 0 && (
-                <div className="total-size-bar" id="total-size-bar">
-                  <div className="total-size-label">
-                    <span>
-                      {(uploadTotalSize / (1024 * 1024)).toFixed(1)} MB / 25 MB
-                    </span>
-                    <span>{Math.round(uploadPercent)}%</span>
-                  </div>
-                  <div className="total-size-track">
-                    <div
-                      className={uploadFillClass}
-                      style={{ width: `${uploadPercent}%` }}
-                    />
-                  </div>
-                </div>
-              )}
 
               <p
                 className="status-message"

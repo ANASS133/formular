@@ -104,7 +104,6 @@ export default function App() {
   const [faqOpen, setFaqOpen] = useState(null);
   const [featureVisible, setFeatureVisible] = useState([]);
   const [uploadFiles, setUploadFiles] = useState([]);
-  const [uploadTotalSize, setUploadTotalSize] = useState(0);
 
   const formRef = useRef(null);
   const featureRefs = useRef([]);
@@ -207,7 +206,6 @@ export default function App() {
     setSelectedPack(null);
     setCurrentStep(1);
     setUploadFiles([]);
-    setUploadTotalSize(0);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
@@ -215,7 +213,6 @@ export default function App() {
   useEffect(() => {
     const handler = () => {
       setUploadFiles([]);
-      setUploadTotalSize(0);
       setSubmitted(true);
     };
     window.addEventListener("formSubmissionSuccess", handler);
@@ -534,8 +531,6 @@ export default function App() {
   setCurrentStep={setCurrentStep}
   uploadFiles={uploadFiles}
   setUploadFiles={setUploadFiles}
-  uploadTotalSize={uploadTotalSize}
-  setUploadTotalSize={setUploadTotalSize}
 />
       {/* ── Testimonials ── */}
       <section className="testimonials-section">

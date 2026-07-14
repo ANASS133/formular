@@ -1417,33 +1417,6 @@ input, select, button { font: inherit; }
 
 .file-remove:hover { color: var(--color-danger); }
 
-/* Total size bar */
-.total-size-bar { margin-top: 8px; }
-
-.total-size-label {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.78rem;
-  color: var(--color-muted);
-  margin-bottom: 4px;
-}
-
-.total-size-track {
-  height: 5px;
-  border-radius: 3px;
-  background: var(--color-border);
-}
-
-.total-size-fill {
-  height: 100%;
-  border-radius: 3px;
-  background: var(--color-primary);
-  transition: width 0.3s;
-}
-
-.total-size-fill.warning { background: var(--color-warning); }
-.total-size-fill.danger { background: var(--color-danger); }
-
 /* Status */
 .status-message {
   min-height: 24px;
